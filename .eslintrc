@@ -19,6 +19,7 @@
     "no-confusing-arrow": 1,
     "arrow-body-style": 0,
     "arrow-parens": 0,
+    "import/no-dynamic-require": 0,
     "comma-dangle": 0,
     "curly": [2, "multi-line"],
     "valid-jsdoc": [2, {
