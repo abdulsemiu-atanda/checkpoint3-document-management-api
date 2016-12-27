@@ -1,5 +1,5 @@
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   const document = sequelize.define('Document', {
     title: DataTypes.STRING,
     content: DataTypes.STRING,

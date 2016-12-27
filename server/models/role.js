@@ -1,4 +1,4 @@
-module.exports = function (sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   const role = sequelize.define('Role', {
     title: DataTypes.STRING,
     allowNull: false,
