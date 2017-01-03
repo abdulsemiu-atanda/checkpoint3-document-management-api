@@ -1,14 +1,7 @@
+import bCrypt from 'bcrypt';
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
-    firstName: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    lastName: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
     email: {
       type: DataTypes.STRING,
       allowNull: false
@@ -41,6 +34,16 @@ module.exports = (sequelize, DataTypes) => {
           },
           onDelete: 'CASCADE'
         });
+      }
+    },
+    hooks: {
+      beforeCreate: (theUser) => {
+        theUser.password = bCrypt.hashSync(theUser.password,
+            bCrypt.genSaltSync(8));
+      },
+      beforeUpdate: (theUser) => {
+        theUser.password = bCrypt.hashSync(theUser.password,
+            bCrypt.genSaltSync(8));
       }
     }
   });

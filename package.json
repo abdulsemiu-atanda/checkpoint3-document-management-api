@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/andela-aatanda/checkpoint3-document-management-api#readme",
   "dependencies": {
-    "bcrypt": "^1.0.1",
+    "bcrypt": "^1.0.2",
     "body-parser": "^1.15.2",
     "dotenv": "^2.0.0",
     "express": "^4.14.0",
