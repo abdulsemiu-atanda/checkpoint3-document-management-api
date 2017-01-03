@@ -1,6 +1,6 @@
 
 module.exports = (sequelize, DataTypes) => {
-  const user = sequelize.define('User', {
+  const User = sequelize.define('User', {
     firstName: {
       type: DataTypes.STRING,
       allowNull: false
@@ -20,17 +20,21 @@ module.exports = (sequelize, DataTypes) => {
     password: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    RoleId: {
+      allowNull: false,
+      type: DataTypes.INTEGER
     }
   }, {
     classMethods: {
       associate: (models) => {
-        user.belongsTo(models.role, {
+        User.belongsTo(models.Role, {
           foreignKey: {
             allowNull: false
           },
           onDelete: 'CASCADE'
         });
-        user.hasMany(models.document, {
+        User.hasMany(models.Document, {
           foreignKey: {
             name: 'ownerId',
             allowNull: false,
@@ -40,5 +44,5 @@ module.exports = (sequelize, DataTypes) => {
       }
     }
   });
-  return user;
+  return User;
 };

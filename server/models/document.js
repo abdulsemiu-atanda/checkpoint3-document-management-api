@@ -1,21 +1,32 @@
-
 module.exports = (sequelize, DataTypes) => {
-  const document = sequelize.define('Document', {
-    title: DataTypes.STRING,
-    content: DataTypes.STRING,
-    access: DataTypes.STRING
+  const Document = sequelize.define('Document', {
+    title: {
+      allowNull: false,
+      type: DataTypes.STRING
+    },
+    content: {
+      allowNull: false,
+      type: DataTypes.TEXT
+    },
+    OwnerId: DataTypes.INTEGER,
+    access: {
+      defaultValue: 'public',
+      type: DataTypes.STRING,
+      validate: {
+        isIn: [['private', 'public', 'role']]
+      }
+    },
   }, {
     classMethods: {
-      associate: (models) => {
-        document.belongsTo(models.user, {
-          as: 'owner',
-          foreignKey: {
-            allowNull: false,
-          },
-          onDelete: 'CASCADE'
+      associate(models) {
+        Document.belongsTo(models.User, {
+          as: 'Owner',
+          onDelete: 'CASCADE',
+          foreignKey: { allowNull: false }
         });
       }
     }
   });
-  return document;
+
+  return Document;
 };
