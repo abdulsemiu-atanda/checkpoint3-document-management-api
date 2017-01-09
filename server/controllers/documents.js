@@ -6,7 +6,7 @@ import Auth from './auth';
  */
 class DocumentController {
   /**
-   * Method that handles post request for creating new document in database
+   * Method that handles request for creating new document
    * @param {Object} req
    * @param {Object} res
    * @return {Object} response
@@ -19,12 +19,39 @@ class DocumentController {
       OwnerId: decoded.id,
       access: req.body.access
     })
-    .then(doc => {
-      res.status(201).send(doc);
+      .then(doc => {
+        res.status(201).send(doc);
+      })
+      .catch(err => {
+        res.status(400).send(err);
+      });
+  }
+  /**
+   * Method that handles request for listing documents
+   * @param {Object} req
+   * @param {Object} res
+   * @return {Object} response
+   */
+  static list(req, res) {
+    const decoded = Auth.verify(req.headers.authorization);
+    if (decoded === false) {
+      res.status(401).send({ message: 'Invalid credentials' });
+      return false;
+    }
+    db.Document.findAll({
+      where: {
+        $or: [
+          { OwnerId: decoded.id },
+          { access: 'public' }
+        ]
+      }
     })
-    .catch(err =>{
-      res.status(400).send(err);
-    });
+      .then(docs => {
+        res.status(200).send(docs);
+      })
+      .catch(err => {
+        res.status(404).send(err);
+      });
   }
 }
 
