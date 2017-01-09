@@ -9,7 +9,7 @@ module.exports = (app) => {
   }));
   app.get('/api/role', Role.list);
   app.get('/api/document', DocumentController.list);
-  app.get('/api/user', Auth.login);
+  app.get('/api/user', User.fetchDetails);
   app.get('/api/user/login', User.login);
 
   app.post('/api/document', DocumentController.create);
