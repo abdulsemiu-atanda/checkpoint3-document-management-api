@@ -8,7 +8,9 @@ module.exports = (app) => {
     message: 'Welcome to the Document Management API!',
   }));
   app.get('/api/role', Role.list);
-  app.get('/api/user/login', Auth.login);
+  app.get('/api/document', DocumentController.list);
+  app.get('/api/user', Auth.login);
+  app.get('/api/user/login', User.login);
 
   app.post('/api/document', DocumentController.create);
   app.post('/api/role', Role.create);
