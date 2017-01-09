@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import db from '../models';
 import Auth from './auth';
 
@@ -29,14 +30,18 @@ class User {
     })
       .spread((user, created) => {
         if (created) {
-          const token = jwt.sign({
+          const newToken = jwt.sign({
             id: user.id,
             username: user.username,
             email: user.email,
-            password: user.password
+            password: user.password,
+            roleId: user.RoleId
           }, secret, { expiresIn: '24h' });
           return res.status(201)
-            .send({ message: `User created Token: ${token} expires in a day` });
+            .send({
+              message: 'User created and token expires in a day',
+              token: newToken
+            });
         }
         return res.status(302).send({ message: 'User already exists' });
       });
@@ -64,14 +69,65 @@ class User {
             lastName: result.lastName,
             email: result.email,
             username: result.username,
-            password: result.password
+            password: result.password,
+            roleId: result.RoleId
           }, secret, { expiresIn: '24h' });
           return res.status(202)
             .send({
-              message: `User created Token: ${newToken} expires in a day`
+              message: 'user firstName has been updated',
+              token: newToken
             });
         });
       });
+  }
+  /**
+   * Methods that updates user attributes
+   * @param {Object} req
+   * @param {Object} res
+   * @return {Object} response with appropriate status
+   */
+  static login(req, res) {
+    db.User.findOne({
+      where: {
+        username: req.query.username
+      }
+    })
+      .then(result => {
+        bcrypt.compare(req.query.password, result.password, (err, response) => {
+          if (response) {
+            res.status(200).send({ message: 'Login was successful' });
+          } else {
+            res.status(404).send({ message: 'Username or password incorrect' });
+          }
+        });
+      });
+  }
+  /**
+   * Method that handles verification of jsonwebtoken
+   * @param {Object} req
+   * @param {Object} res
+   * @return {Object} response with status and decoded token or error
+   */
+  static fetchDetails(req, res) {
+    const userDetails = Auth.verify(req.headers.authorization);
+    if (req.headers.authorization === undefined || userDetails === false) {
+      res.status(401).send({ message: 'Invalid credentials' });
+      return false;
+    }
+    db.User.findAll({
+      where: {
+        password: userDetails.password
+      }
+    }).spread(result => res.status(302).send({
+      id: result.id,
+      name: {
+        firstName: result.firstName,
+        lastName: result.lastName
+      },
+      email: result.email,
+      password: result.password,
+      roleId: result.RoleId
+    }));
   }
 }
 
