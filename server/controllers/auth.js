@@ -20,35 +20,6 @@ class Authentication {
       return false;
     }
   }
-
-  /**
-   * Method that handles verification of jsonwebtoken
-   * @param {Object} req
-   * @param {Object} res
-   * @return {Object} response with status and decoded token or error
-   */
-  static login(req, res) {
-    const userDetails = Authentication.verify(req.headers.authorization);
-    if (req.headers.authorization === undefined || userDetails === false) {
-      res.status(401).send({ message: 'Invalid credentials' });
-    }
-    db.User.findAll({
-      where: {
-        password: userDetails.password
-      }
-    }).spread(result => res.status(302).send({
-      id: result.id,
-      name: {
-        firstName: result.firstName,
-        lastName: result.lastName
-      },
-      email: result.email,
-      password: result.password
-    }))
-      .catch(err => {
-        res.status(404).send(err);
-      });
-  }
 }
 
 export default Authentication;
