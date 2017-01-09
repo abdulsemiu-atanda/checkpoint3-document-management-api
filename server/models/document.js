@@ -1,6 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
   const Document = sequelize.define('Document', {
     title: {
+      unique: true,
       allowNull: false,
       type: DataTypes.STRING
     },
