@@ -2,20 +2,16 @@ import fs from 'fs';
 import path from 'path';
 import Sequelize from 'sequelize';
 
+require('dotenv').config();
+
 const env = process.env.NODE_ENV || 'development';
 const config = require(`${__dirname}/../config/config.json`)[env];
 const basename = path.basename(module.filename);
 
 const db = {};
-let sequelize;
-
-if (process.env.NODE_ENV === 'production') {
-  sequelize = new Sequelize(process.env.DATABASE_URL);
-} else {
-  sequelize = new Sequelize(
-    config.database, config.username, config.password, config
-  );
-}
+const sequelize = (config.use_env_variable)
+  ? new Sequelize(process.env[config.use_env_variable])
+  : new Sequelize(process.env.DB_NAME, process.env.DB_USERNAME, process.env.DB_PASSWORD, config);
 
 
 fs
