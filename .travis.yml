@@ -1,0 +1,19 @@
+language: node_js
+
+node_js:
+  - node
+
+services:
+  - postgresql
+
+before_script:
+  - psql -c 'drop database if exists testdb;' -U root -P 'password'
+  - psql -c 'create database testdb;' -U postgres -P 'password'
+  - NODE_ENV=test npm run migrations
+
+script:
+  - NODE_ENV=test npm test
+
+
+addons:
+  postgresql: "9.3"
