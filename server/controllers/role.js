@@ -13,19 +13,19 @@ class Role {
    */
   static create(req, res) {
     const validUser = Auth.verify(req.headers.authorization);
-    if (validUser === false) {
+    if (validUser === false || validUser.id !== 1) {
       res.status(401).send({ message: 'Invalid Credentials' });
-    } else if (validUser.roleId === 1) {
-      db.Role.create({
-        title: req.body.title
-      })
-        .then((role) => {
-          res.status(201).send(role);
-        })
-        .catch((err) => {
-          res.status(400).send(err.errors);
-        });
+      return false;
     }
+    db.Role.create({
+      title: req.body.title
+    })
+      .then((role) => {
+        res.status(201).send(role);
+      })
+      .catch((err) => {
+        res.status(400).send(err.errors);
+      });
   }
 
   /**
@@ -40,9 +40,6 @@ class Role {
       db.Role.all()
         .then((role) => {
           res.status(201).send(role);
-        })
-        .catch((err) => {
-          res.status(400).send(err.errors);
         });
     } else {
       res.status(402).send({ message: 'You are not an Admin' });

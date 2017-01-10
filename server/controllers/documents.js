@@ -26,6 +26,7 @@ class DocumentController {
         res.status(400).send(err);
       });
   }
+
   /**
    * Method that handles request for listing documents
    * @param {Object} req
@@ -48,10 +49,30 @@ class DocumentController {
     })
       .then(docs => {
         res.status(200).send(docs);
-      })
-      .catch(err => {
-        res.status(404).send(err);
       });
+  }
+
+  /**
+   * Method that handles request for listing documents
+   * @param {Object} req
+   * @param {Object} res
+   * @return {Object} response
+   */
+  static discard(req, res) {
+    const decoded = Auth.verify(req.headers.authorization);
+    if (decoded === false) {
+      res.status(401).send({ message: 'Invalid credentials' });
+      return false;
+    }
+    db.Document.destroy({
+      where: {
+        id: req.query.id
+      },
+      truncate: true
+    })
+    .then(() => {
+      res.status(200).send({ message: 'Document deleted' });
+    });
   }
 }
 

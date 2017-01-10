@@ -81,7 +81,7 @@ class User {
       });
   }
   /**
-   * Methods that updates user attributes
+   * Methods that logs in user
    * @param {Object} req
    * @param {Object} res
    * @return {Object} response with appropriate status
@@ -102,8 +102,18 @@ class User {
         });
       });
   }
+
   /**
-   * Method that handles verification of jsonwebtoken
+   * Methods that logs ou user
+   * @param {Object} req
+   * @param {Object} res
+   * @return {Object} response with appropriate status
+   */
+  static logout(req, res) {
+    res.status(200).send({ message: 'Log out successful' });
+  }
+  /**
+   * Method that handles fetching user details
    * @param {Object} req
    * @param {Object} res
    * @return {Object} response with status and decoded token or error
@@ -113,21 +123,59 @@ class User {
     if (req.headers.authorization === undefined || userDetails === false) {
       res.status(401).send({ message: 'Invalid credentials' });
       return false;
+    } else if (req.query.id === undefined) {
+      db.User.findAll({
+        where: {
+          password: userDetails.password
+        }
+      }).spread(result => res.status(302).send({
+        id: result.id,
+        name: {
+          firstName: result.firstName,
+          lastName: result.lastName
+        },
+        email: result.email,
+        password: result.password,
+        roleId: result.RoleId
+      }));
+    } else {
+      db.User.findOne({
+        where: {
+          id: req.query.id
+        }
+      }).then(result => res.status(302).send({
+        id: result.id,
+        name: {
+          firstName: result.firstName,
+          lastName: result.lastName
+        },
+        email: result.email,
+        password: result.password,
+        roleId: result.RoleId
+      }));
     }
-    db.User.findAll({
+  }
+  /**
+   * Method that handles deleting user details
+   * @param {Object} req
+   * @param {Object} res
+   * @return {Object} response with status and decoded token or error
+   */
+  static discard(req, res) {
+    const userDetails = Auth.verify(req.headers.authorization);
+    if (userDetails.roleId !== 1 || userDetails === false) {
+      res.status(401).send({ message: 'Invalid credentials' });
+      return false;
+    }
+    db.User.destroy({
       where: {
-        password: userDetails.password
-      }
-    }).spread(result => res.status(302).send({
-      id: result.id,
-      name: {
-        firstName: result.firstName,
-        lastName: result.lastName
+        id: req.query.id
       },
-      email: result.email,
-      password: result.password,
-      roleId: result.RoleId
-    }));
+      truncate: true
+    })
+    .then(() => {
+      res.status(200).send({ message: 'User successfuly deleted' });
+    });
   }
 }
 
