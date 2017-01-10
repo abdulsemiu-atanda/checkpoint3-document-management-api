@@ -11,10 +11,14 @@ module.exports = (app) => {
   app.get('/api/document', DocumentController.list);
   app.get('/api/user', User.fetchDetails);
   app.get('/api/user/login', User.login);
+  app.get('/api/user/logout', User.logout);
 
   app.post('/api/document', DocumentController.create);
   app.post('/api/role', Role.create);
   app.post('/api/user', User.create);
 
   app.put('/api/user', User.update);
+
+  app.delete('/api/user', User.discard);
+  app.delete('/api/document', DocumentController.discard);
 };
