@@ -10,7 +10,7 @@
     "start": "nodemon app.js --exec babel-node",
     "test": "babel-node ./node_modules/.bin/babel-istanbul cover ./node_modules/.bin/_mocha test/server",
     "seed": "babel-node server/seeders/seeders.js",
-    "migrations": "sequelize db:migrate"
+    "migrations": "node_modules/.bin/sequelize db:migrate"
   },
   "repository": {
     "type": "git",
