@@ -8,7 +8,7 @@ services:
 
 before_script:
   - psql -c 'drop database if exists testdb;' -U root -P 'password'
-  - psql -c 'create database testdb;' -U postgres -P 'password'
+  - psql -c 'create database testdb;' -U root -P 'password'
   - NODE_ENV=test npm run migrations
 
 script:
