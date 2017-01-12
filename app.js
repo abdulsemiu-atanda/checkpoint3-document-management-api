@@ -1,3 +1,4 @@
+/* eslint no-console: "off" */
 import express from 'express';
 import bodyParser from 'body-parser';
 import route from './server/routes';
