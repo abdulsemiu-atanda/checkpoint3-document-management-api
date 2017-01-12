@@ -80,7 +80,7 @@ describe('GET /document', () => {
     });
   });
 
-  it('should return document of specified user', (done) => {
+  it('should return correct status code for unauthorized user', (done) => {
     request(app)
     .get('/api/user/1/document')
     .end((err, res) => {
