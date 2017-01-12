@@ -37,10 +37,21 @@ class Role {
   static list(req, res) {
     const adminUser = Auth.verify(req.headers.authorization);
     if (adminUser.roleId === 1 && adminUser !== false) {
-      db.Role.all()
-        .then((role) => {
-          res.status(201).send(role);
-        });
+      if (req.query.title === undefined) {
+        db.Role.all()
+          .then((role) => {
+            res.status(201).send(role);
+          });
+      } else {
+        db.Role.findOne({
+          where: {
+            title: req.query.title
+          }
+        })
+          .then((role) => {
+            res.status(201).send(role);
+          });
+      }
     } else {
       res.status(402).send({ message: 'You are not an Admin' });
     }

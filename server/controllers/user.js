@@ -104,7 +104,7 @@ class User {
   }
 
   /**
-   * Methods that logs ou user
+   * Methods that logs out user
    * @param {Object} req
    * @param {Object} res
    * @return {Object} response with appropriate status

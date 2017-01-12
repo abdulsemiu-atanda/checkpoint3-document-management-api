@@ -38,22 +38,57 @@ class DocumentController {
     if (decoded === false) {
       res.status(401).send({ message: 'Invalid credentials' });
       return false;
+    } else if (req.query.order === undefined && req.query.limit === undefined) {
+      db.Document.findAll({
+        where: {
+          $or: [
+            { OwnerId: decoded.id },
+            { access: 'public' }
+          ]
+        }
+      })
+        .then(docs => {
+          res.status(200).send(docs);
+        });
+    } else {
+      db.Document.findAll({
+        order: '"createdAt" DESC',
+        where: {
+          $or: [
+            { OwnerId: decoded.id },
+            { access: 'public' }
+          ]
+        },
+        limit: req.query.limit || 5
+      })
+        .then((docs) => {
+          res.status(200).send(docs);
+        });
+    }
+  }
+  /**
+     * Method that fetches specified user document
+     * @param {Object} req
+     * @param {Object} res
+     * @return {Object} response
+     */
+  static fetchUserDoc(req, res) {
+    const decoded = Auth.verify(req.headers.authorization);
+    if (decoded === false) {
+      res.status(401).send({ message: 'Invalid credentials' });
+      return false;
     }
     db.Document.findAll({
       where: {
-        $or: [
-          { OwnerId: decoded.id },
-          { access: 'public' }
-        ]
+        OwnerId: req.params.id
       }
     })
-      .then(docs => {
+      .spread(docs => {
         res.status(200).send(docs);
       });
   }
-
   /**
-   * Method that handles request for listing documents
+   * Method that handles request for deleting documents
    * @param {Object} req
    * @param {Object} res
    * @return {Object} response
@@ -70,9 +105,9 @@ class DocumentController {
       },
       truncate: true
     })
-    .then(() => {
-      res.status(200).send({ message: 'Document deleted' });
-    });
+      .then(() => {
+        res.status(200).send({ message: 'Document deleted' });
+      });
   }
 }
 
