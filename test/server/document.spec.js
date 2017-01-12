@@ -38,12 +38,14 @@ describe('GET /document', () => {
     });
   });
 
-  it('should create document and return success code', (done) => {
+  it('should create document with published date and public access', (done) => {
     request(app)
       .post('/api/document').send(fakeUserDocument)
       .set('Authorization', fakeUserToken)
       .end((err, res) => {
         expect(res.status).to.equal(201);
+        expect(res.body.access).to.equal('public');
+        expect({}.hasOwnProperty.call(res.body, 'createdAt')).to.be.true;
         done();
       });
   });
@@ -56,6 +58,35 @@ describe('GET /document', () => {
         expect(res.status).to.equal(400);
         done();
       });
+  });
+
+  it('should create admin document', (done) => {
+    request(app)
+      .post('/api/document').send(fakeAdminDocument)
+      .set('Authorization', fakeAdminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(201);
+        done();
+      });
+  });
+
+  it('should return document of specified user', (done) => {
+    request(app)
+    .get('/api/user/1/document')
+    .set('Authorization', fakeAdminToken)
+    .end((err, res) => {
+      expect(res.body.title).to.equal(fakeAdminDocument.title);
+      done();
+    });
+  });
+
+  it('should return document of specified user', (done) => {
+    request(app)
+    .get('/api/user/1/document')
+    .end((err, res) => {
+      expect(res.status).to.equal(401);
+      done();
+    });
   });
 
   it('should return error status code for invalid user', (done) => {
@@ -74,6 +105,15 @@ describe('GET /document', () => {
       .end((err, res) => {
         expect(res.status).to.equal(200);
       });
+  });
+
+  it('should order document when specified', () => {
+    request(app)
+    .get('/api/document?order=order')
+    .set('Authorization', fakeUserToken)
+    .end((err, res) => {
+      expect(res.status).to.equal(200);
+    });
   });
 
   it('should return error status code to unauthorized user', () => {

@@ -87,6 +87,24 @@ describe('Roles', () => {
           expect(res.status).to.equal(400);
         });
     });
+
+    it('should return success for admin role', () => {
+      request(app)
+      .get('/api/role?title=Admin')
+      .set('Authorization', fakeAdminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(201);
+      });
+    });
+
+    it('should return success for regular role', () => {
+      request(app)
+      .get('/api/role?title=Regular')
+      .set('Authorization', fakeAdminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(201);
+      });
+    });
   });
 
   after(() =>
