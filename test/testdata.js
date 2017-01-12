@@ -17,8 +17,7 @@ const testdata = {
   },
   fakeUserDoc: {
     title: 'Brown Fox',
-    content: 'The Quick Brown Fox jumps over the lazy dog',
-    access: 'public'
+    content: 'The Quick Brown Fox jumps over the lazy dog'
   },
   fakeAdminDoc: {
     title: 'Scooby Doo',
