@@ -8,6 +8,7 @@ module.exports = (app) => {
   }));
   app.get('/api/role', Role.list);
   app.get('/api/document', DocumentController.list);
+  app.get('/api/user/:id/document', DocumentController.fetchUserDoc);
   app.get('/api/user', User.fetchDetails);
   app.get('/api/user/login', User.login);
   app.get('/api/user/logout', User.logout);
