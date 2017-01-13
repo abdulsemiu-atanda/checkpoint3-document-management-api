@@ -10,6 +10,7 @@ const fakeAdmin = testdata.fakeAdmin;
 const fakeAdminDocument = testdata.fakeAdminDoc;
 const fakeUserDocument = testdata.fakeUserDoc;
 const docId = 1;
+const newDocTitle = { title: 'Sweet Talker' };
 let fakeAdminToken;
 let fakeUserToken;
 
@@ -92,46 +93,70 @@ describe('GET /document', () => {
       });
   });
 
-  it('should return documents to authorized user', () => {
+  it('should return documents to authorized user', (done) => {
     request(app)
       .get('/api/document')
       .set('Authorization', fakeAdminToken)
       .end((err, res) => {
         expect(res.status).to.equal(200);
+        done();
       });
   });
 
-  it('should order document when specified', () => {
+  it('should order document when specified', (done) => {
     request(app)
     .get('/api/document?order=order')
     .set('Authorization', fakeUserToken)
     .end((err, res) => {
       expect(res.status).to.equal(200);
+      done();
     });
   });
 
-  it('should return error status code to unauthorized user', () => {
+  it('should return error status code to unauthorized user', (done) => {
     request(app)
       .get('/api/document')
       .end((err, res) => {
         expect(res.status).to.equal(401);
+        done();
       });
   });
 
-  it('should return success when document is deleted', () => {
+  it('should return correct updated title', (done) => {
+    request(app)
+      .put('/api/document/1').send(newDocTitle)
+      .set('Authorization', fakeAdminToken)
+      .end((err, res) => {
+        expect(res.body.title).to.equal(newDocTitle.title);
+        done();
+      });
+  });
+
+  it('should return error for unauthorized user', (done) => {
+    request(app)
+      .put('/api/document/1')
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+  });
+
+  it('should return success when document is deleted', (done) => {
     request(app)
       .delete(`/api/document?id=${docId}`)
       .set('Authorization', fakeAdminToken)
       .end((err, res) => {
         expect(res.body.message).to.equal('Document deleted');
+        done();
       });
   });
 
-  it('should return error for unauthorized user', () => {
+  it('should return error for unauthorized user', (done) => {
     request(app)
       .delete(`/api/document?id=${docId}`)
       .end((err, res) => {
         expect(res.status).to.equal(401);
+        done();
       });
   });
 });

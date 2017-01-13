@@ -107,11 +107,11 @@ describe('Document Management System', () => {
 
     it('should return correct status code for attribute update', () => {
       request(app)
-      .put('/api/user').send(newAttribute)
-      .set('Authorization', fakeUserToken)
-      .end((err, res) => {
-        expect(res.status).to.equal(202);
-      });
+        .put('/api/user').send(newAttribute)
+        .set('Authorization', fakeUserToken)
+        .end((err, res) => {
+          expect(res.status).to.equal(202);
+        });
     });
 
     it('should return created user with role', (done) => {
@@ -167,10 +167,10 @@ describe('Document Management System', () => {
 
     it('should return success status code when user logs out', () => {
       request(app)
-      .get('/api/user/logout')
-      .end((err, res) => {
-        expect(res.status).to.equal(200);
-      });
+        .get('/api/user/logout')
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+        });
     });
   });
   describe('POST /user', () => {
@@ -194,22 +194,26 @@ describe('Document Management System', () => {
 
     it('should return error status code for unauthorized user', (done) => {
       request(app)
-      .delete('/api/user?id=2')
-      .set('Authorization', fakeUserToken)
-      .end((err, res) => {
-        expect(res.status).to.equal(401);
-        done();
-      });
+        .delete('/api/user?id=2')
+        .set('Authorization', fakeUserToken)
+        .end((err, res) => {
+          expect(res.status).to.equal(401);
+          done();
+        });
     });
 
     it('should return success status code when admin deletes user', (done) => {
       request(app)
-      .delete(`/api/user?id=${userId}`)
-      .set('Authorization', fakeAdminToken)
-      .end((err, res) => {
-        expect(res.status).to.equal(200);
-        done();
-      });
+        .delete(`/api/user?id=${userId}`)
+        .set('Authorization', fakeAdminToken)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          done();
+        });
+    });
+
+    after(() => {
+      db.sequelize.sync({ force: true });
     });
   });
 });
