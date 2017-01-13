@@ -18,8 +18,8 @@
     "use_env_variable": "DATABASE_URL",
     "username": null,
     "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
+    "database": "df10uj32gj69b5",
+    "host": "ec2-184-72-246-219.compute-1.amazonaws.com",
     "dialect": "postgres"
   }
 }
