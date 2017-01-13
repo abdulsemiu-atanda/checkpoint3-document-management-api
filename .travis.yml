@@ -12,6 +12,7 @@ before_script:
   - psql -c 'drop database if exists testdb;' -U postgres
   - psql -c 'create database testdb;' -U postgres
   - NODE_ENV=test npm run migrations
+  - NODE_ENV=test npm run seed
 
 script:
   - NODE_ENV=test npm test

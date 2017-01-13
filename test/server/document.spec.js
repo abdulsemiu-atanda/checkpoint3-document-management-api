@@ -14,12 +14,6 @@ let fakeAdminToken;
 let fakeUserToken;
 
 describe('GET /document', () => {
-  db.Role.bulkCreate([{
-    title: 'Admin'
-  },
-  {
-    title: 'Regular'
-  }]);
   before((done) => {
     db.Document.sync({ force: true }).then(() => {
       return db.User.sync({ force: true }).then(() => {
