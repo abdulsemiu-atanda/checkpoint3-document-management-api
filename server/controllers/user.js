@@ -60,9 +60,7 @@ class User {
       }
     })
       .then(user => {
-        user.update({
-          firstName: req.body.firstName
-        }).then((result) => {
+        user.update(req.body).then((result) => {
           const newToken = jwt.sign({
             id: result.id,
             firstName: result.firstName,

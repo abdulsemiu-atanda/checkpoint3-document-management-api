@@ -88,6 +88,30 @@ class DocumentController {
       });
   }
   /**
+   * Method that handles request for updating documents
+   * @param {Object} req
+   * @param {Object} res
+   * @return {Object} response
+   */
+  static update(req, res) {
+    const userDetail = Auth.verify(req.headers.authorization);
+    if (userDetail === false) {
+      res.status(401).send({ message: 'You are not authorized' });
+      return false;
+    }
+    db.Document.findOne({
+      where: {
+        id: req.params.id
+      }
+    })
+    .then(document => {
+      document.update(req.body)
+      .then(result => {
+        res.status(202).send(result);
+      });
+    });
+  }
+  /**
    * Method that handles request for deleting documents
    * @param {Object} req
    * @param {Object} res
