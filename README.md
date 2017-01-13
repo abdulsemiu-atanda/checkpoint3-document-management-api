@@ -64,6 +64,8 @@ By generating a token on registration and login, API endpoints and documents are
 Requests to protected routes are validated using the generated token.
 
 ## Endpoints
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/3b0855101a157a960224)
+
 **Users**
 
 Request type | Endpoint | Action 
