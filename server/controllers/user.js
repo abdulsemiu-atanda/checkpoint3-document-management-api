@@ -93,7 +93,19 @@ class User {
       .then(result => {
         bcrypt.compare(req.query.password, result.password, (err, response) => {
           if (response) {
-            res.status(200).send({ message: 'Login was successful' });
+            const newToken = jwt.sign({
+              id: result.id,
+              firstName: result.firstName,
+              lastName: result.lastName,
+              email: result.email,
+              username: result.username,
+              password: result.password,
+              roleId: result.RoleId
+            }, secret, { expiresIn: '24h' });
+            res.status(200).send({
+              message: 'Login was successful',
+              token: newToken
+            });
           } else {
             res.status(404).send({ message: 'Username or password incorrect' });
           }
@@ -171,9 +183,9 @@ class User {
       },
       truncate: true
     })
-    .then(() => {
-      res.status(200).send({ message: 'User successfuly deleted' });
-    });
+      .then(() => {
+        res.status(200).send({ message: 'User successfuly deleted' });
+      });
   }
 }
 
