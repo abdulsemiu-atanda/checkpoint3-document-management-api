@@ -70,7 +70,7 @@ class User {
             password: result.password,
             roleId: result.RoleId
           }, secret, { expiresIn: '24h' });
-          return res.status(202)
+          return res.status(200)
             .send({
               message: 'user firstName has been updated',
               token: newToken
@@ -131,7 +131,7 @@ class User {
   static fetchDetails(req, res) {
     const userDetails = Auth.verify(req.headers.authorization);
     if (req.headers.authorization === undefined || userDetails === false) {
-      res.status(401).send({ message: 'Invalid credentials' });
+      res.status(401).send({ message: 'No credentials were provided' });
       return false;
     } else if (req.query.id === undefined) {
       db.User.findAll({

@@ -13,6 +13,10 @@ class DocumentController {
    */
   static create(req, res) {
     const decoded = Auth.verify(req.headers.authorization);
+    if (decoded === false) {
+      res.status(401).send({ message: 'Unauthorized request' });
+      return false;
+    }
     db.Document.create({
       title: req.body.title,
       content: req.body.content,
@@ -23,7 +27,7 @@ class DocumentController {
         res.status(201).send(doc);
       })
       .catch(err => {
-        res.status(400).send(err);
+        res.status(302).send(err);
       });
   }
 

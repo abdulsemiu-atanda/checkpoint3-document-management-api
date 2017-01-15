@@ -11,8 +11,8 @@ const fakeAdminDocument = testdata.fakeAdminDoc;
 const fakeUserDocument = testdata.fakeUserDoc;
 const docId = 1;
 const newDocTitle = { title: 'Sweet Talker' };
-let fakeAdminToken;
-let fakeUserToken;
+let adminToken;
+let userToken;
 
 describe('GET /document', () => {
   before((done) => {
@@ -21,11 +21,11 @@ describe('GET /document', () => {
         request(app)
           .post('/api/user').send(fakeAdmin)
           .then(res => {
-            fakeAdminToken = res.body.token;
+            adminToken = res.body.token;
             request(app)
               .post('/api/user').send(fakeUser)
               .then(response => {
-                fakeUserToken = response.body.token;
+                userToken = response.body.token;
                 done();
               });
           });
@@ -36,21 +36,21 @@ describe('GET /document', () => {
   it('should create document with published date and public access', (done) => {
     request(app)
       .post('/api/document').send(fakeUserDocument)
-      .set('Authorization', fakeUserToken)
+      .set('Authorization', userToken)
       .end((err, res) => {
         expect(res.status).to.equal(201);
         expect(res.body.access).to.equal('public');
-        expect({}.hasOwnProperty.call(res.body, 'createdAt')).to.be.true;
+        expect(res.body.createdAt).to.be.defined;
         done();
       });
   });
 
-  it('should return error status code for existing document', (done) => {
+  it('should return correct error status code for existing document', (done) => {
     request(app)
       .post('/api/document').send(fakeUserDocument)
-      .set('Authorization', fakeAdminToken)
+      .set('Authorization', adminToken)
       .end((err, res) => {
-        expect(res.status).to.equal(400);
+        expect(res.status).to.equal(302);
         done();
       });
   });
@@ -58,7 +58,7 @@ describe('GET /document', () => {
   it('should create admin document', (done) => {
     request(app)
       .post('/api/document').send(fakeAdminDocument)
-      .set('Authorization', fakeAdminToken)
+      .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.status).to.equal(201);
         done();
@@ -68,14 +68,14 @@ describe('GET /document', () => {
   it('should return document of specified user', (done) => {
     request(app)
     .get('/api/user/1/document')
-    .set('Authorization', fakeAdminToken)
+    .set('Authorization', adminToken)
     .end((err, res) => {
       expect(res.body.title).to.equal(fakeAdminDocument.title);
       done();
     });
   });
 
-  it('should return correct status code for unauthorized user', (done) => {
+  it('should return correct status code for unauthorized requests', (done) => {
     request(app)
     .get('/api/user/1/document')
     .end((err, res) => {
@@ -84,11 +84,11 @@ describe('GET /document', () => {
     });
   });
 
-  it('should return error status code for invalid user', (done) => {
+  it('should return error status code for unauthorized requests', (done) => {
     request(app)
       .post('/api/document').send(fakeAdminDocument)
       .end((err, res) => {
-        expect(res.status).to.equal(400);
+        expect(res.status).to.equal(401);
         done();
       });
   });
@@ -96,7 +96,7 @@ describe('GET /document', () => {
   it('should return documents to authorized user', (done) => {
     request(app)
       .get('/api/document')
-      .set('Authorization', fakeAdminToken)
+      .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.status).to.equal(200);
         done();
@@ -106,14 +106,14 @@ describe('GET /document', () => {
   it('should order document when specified', (done) => {
     request(app)
     .get('/api/document?order=order')
-    .set('Authorization', fakeUserToken)
+    .set('Authorization', userToken)
     .end((err, res) => {
       expect(res.status).to.equal(200);
       done();
     });
   });
 
-  it('should return error status code to unauthorized user', (done) => {
+  it('should return error status code for unauthorized requests', (done) => {
     request(app)
       .get('/api/document')
       .end((err, res) => {
@@ -122,17 +122,17 @@ describe('GET /document', () => {
       });
   });
 
-  it('should return correct updated title', (done) => {
+  it('should return correct updated attribute', (done) => {
     request(app)
       .put('/api/document/1').send(newDocTitle)
-      .set('Authorization', fakeAdminToken)
+      .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.body.title).to.equal(newDocTitle.title);
         done();
       });
   });
 
-  it('should return error for unauthorized user', (done) => {
+  it('should return error status code for unauthorized requests', (done) => {
     request(app)
       .put('/api/document/1')
       .end((err, res) => {
@@ -141,17 +141,17 @@ describe('GET /document', () => {
       });
   });
 
-  it('should return success when document is deleted', (done) => {
+  it('should be able to delete document', (done) => {
     request(app)
       .delete(`/api/document?id=${docId}`)
-      .set('Authorization', fakeAdminToken)
+      .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.body.message).to.equal('Document deleted');
         done();
       });
   });
 
-  it('should return error for unauthorized user', (done) => {
+  it('should not allow unauthorized requests to delete document', (done) => {
     request(app)
       .delete(`/api/document?id=${docId}`)
       .end((err, res) => {

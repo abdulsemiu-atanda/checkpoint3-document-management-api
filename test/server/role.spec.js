@@ -38,14 +38,6 @@ describe('Roles', () => {
         .set('Authorization', fakeUserToken)
         .end((err, res) => {
           expect(res.body.message).to.equal('You are not an Admin');
-        });
-    });
-
-    it('should return correct status code for non admin user', () => {
-      request(app)
-        .get('/api/role')
-        .set('Authorization', fakeUserToken)
-        .end((err, res) => {
           expect(res.status).to.equal(404);
         });
     });

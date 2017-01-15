@@ -59,7 +59,7 @@ describe('Document Management System', () => {
         .get('/api/user')
         .expect(401)
         .then((res) => {
-          expect(res.body.message).to.equal('Invalid credentials');
+          expect(res.body.message).to.equal('No credentials were provided');
           done();
         });
     });
@@ -110,7 +110,7 @@ describe('Document Management System', () => {
         .put('/api/user').send(newAttribute)
         .set('Authorization', fakeUserToken)
         .end((err, res) => {
-          expect(res.status).to.equal(202);
+          expect(res.status).to.equal(200);
         });
     });
 
@@ -145,21 +145,11 @@ describe('Document Management System', () => {
         });
     });
 
-    it('should return correct message for wrong credentials', (done) => {
+    it('should return correct message and status code for wrong credentials', (done) => {
       request(app)
         .get(`/api/user/login?username=${fakeUser.username}&password=${wrongPassword}`)
-        .expect(404)
         .end((err, res) => {
           expect(res.body.message).to.equal('Username or password incorrect');
-          done();
-        });
-    });
-
-    it('should return correct status code for wrong credentials', (done) => {
-      request(app)
-        .get(`/api/user/login?username=${fakeUser.username}&password=${wrongPassword}`)
-        .expect(404)
-        .end((err, res) => {
           expect(res.status).to.equal(404);
           done();
         });
