@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 
-const secret = process.env.SECRET || 'tshabalala';
+require('dotenv').config();
+
+const secret = process.env.SECRET;
 
 /**
  * Authentication class that handles registered user verification

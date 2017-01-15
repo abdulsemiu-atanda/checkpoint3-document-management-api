@@ -3,7 +3,9 @@ import bcrypt from 'bcrypt';
 import db from '../models';
 import Auth from './auth';
 
-const secret = 'tshabalala';
+require('dotenv').config();
+
+const secret = process.env.SECRET;
 /**
  * User class that handles all user related actions
  */
