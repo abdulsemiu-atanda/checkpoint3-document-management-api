@@ -45,7 +45,7 @@ class User {
               token: newToken
             });
         }
-        return res.status(302).send({ message: 'User already exists' });
+        return res.status(409).send({ message: 'User already exists' });
       });
   }
   /**
@@ -74,7 +74,7 @@ class User {
           }, secret, { expiresIn: '24h' });
           return res.status(200)
             .send({
-              message: 'user firstName has been updated',
+              message: 'user attribute has been updated',
               token: newToken
             });
         });
@@ -109,7 +109,7 @@ class User {
               token: newToken
             });
           } else {
-            res.status(404).send({ message: 'Username or password incorrect' });
+            res.status(400).send({ message: 'Username or password incorrect' });
           }
         });
       });

@@ -150,7 +150,7 @@ describe('Document Management System', () => {
         .get(`/api/user/login?username=${fakeUser.username}&password=${wrongPassword}`)
         .end((err, res) => {
           expect(res.body.message).to.equal('Username or password incorrect');
-          expect(res.status).to.equal(404);
+          expect(res.status).to.equal(400);
           done();
         });
     });
@@ -177,7 +177,7 @@ describe('Document Management System', () => {
       request(app)
         .post('/api/user').send(fakeUser)
         .end((err, res) => {
-          expect(res.status).to.equal(302);
+          expect(res.status).to.equal(409);
           done();
         });
     });
