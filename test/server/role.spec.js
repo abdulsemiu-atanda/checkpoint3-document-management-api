@@ -32,13 +32,14 @@ describe('Roles', () => {
   });
 
   describe('GET /role', () => {
-    it('should return message for non admin user', () => {
+    it('should return message for non admin user', (done) => {
       request(app)
         .get('/api/role')
         .set('Authorization', fakeUserToken)
         .end((err, res) => {
           expect(res.body.message).to.equal('You are not an Admin');
-          expect(res.status).to.equal(404);
+          expect(res.status).to.equal(402);
+          done();
         });
     });
 
@@ -52,11 +53,12 @@ describe('Roles', () => {
         });
     });
 
-    it('should return correct status code for invalid user', () => {
+    it('should return correct status code for invalid user', (done) => {
       request(app)
         .post('/api/role').send(newRole)
         .end((err, res) => {
           expect(res.status).to.equal(401);
+          done();
         });
     });
 
@@ -71,30 +73,33 @@ describe('Roles', () => {
         });
     });
 
-    it('should return error status for existing role', () => {
+    it('should return error status for existing role', (done) => {
       request(app)
         .post('/api/role').send(newRole)
         .set('Authorization', fakeAdminToken)
         .end((err, res) => {
           expect(res.status).to.equal(400);
+          done();
         });
     });
 
-    it('should return success for admin role', () => {
+    it('should return success for admin role', (done) => {
       request(app)
       .get('/api/role?title=Admin')
       .set('Authorization', fakeAdminToken)
       .end((err, res) => {
         expect(res.status).to.equal(201);
+        done();
       });
     });
 
-    it('should return success for regular role', () => {
+    it('should return success for regular role', (done) => {
       request(app)
       .get('/api/role?title=Regular')
       .set('Authorization', fakeAdminToken)
       .end((err, res) => {
         expect(res.status).to.equal(201);
+        done();
       });
     });
   });

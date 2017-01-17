@@ -39,19 +39,21 @@ describe('Document Management System', () => {
   });
 
   describe('GET /user', () => {
-    it('should return a welcome message when api endpoint is hit', () => {
+    it('should return a welcome message when api endpoint is hit', (done) => {
       request(app)
         .get('/api')
         .end((err, res) => {
           expect(res.body.message).to.equal('Welcome to the Document Management API!');
+          done();
         });
     });
 
-    it('should return a welcome for non existing route', () => {
+    it('should return a welcome for non existing route', (done) => {
       request(app)
         .get('/api/chew')
         .end((err, res) => {
           expect(res.body.message).to.equal('Welcome to Document management');
+          done();
         });
     });
     it('should return message for unauthorized user', (done) => {
@@ -105,12 +107,13 @@ describe('Document Management System', () => {
         });
     });
 
-    it('should return correct status code for attribute update', () => {
+    it('should return correct status code for attribute update', (done) => {
       request(app)
         .put('/api/user').send(newAttribute)
         .set('Authorization', fakeUserToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
+          done();
         });
     });
 
@@ -155,11 +158,12 @@ describe('Document Management System', () => {
         });
     });
 
-    it('should return success status code when user logs out', () => {
+    it('should return success status code when user logs out', (done) => {
       request(app)
         .get('/api/user/logout')
         .end((err, res) => {
           expect(res.status).to.equal(200);
+          done();
         });
     });
   });
@@ -203,7 +207,7 @@ describe('Document Management System', () => {
     });
 
     after(() => {
-      db.sequelize.sync({ force: true });
+      return db.Role.sequelize.sync({ force: true });
     });
   });
 });
