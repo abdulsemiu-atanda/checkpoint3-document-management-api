@@ -22,4 +22,5 @@ module.exports = (app) => {
 
   app.delete('/api/user', User.discard);
   app.delete('/api/document', Document.discard);
+  app.delete('/api/role/:id', Role.discard);
 };
