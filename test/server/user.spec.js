@@ -75,13 +75,14 @@ describe('Document Management System', () => {
         });
     });
 
-    it('should return created user valid firstName', (done) => {
+    it('should return created user valid firstName and lastName', (done) => {
       request(app)
         .get('/api/user')
         .set('Authorization', fakeAdminToken)
         .expect(200)
         .end((err, res) => {
           expect(res.body.name.firstName).to.equal(fakeAdmin.firstName);
+          expect(res.body.name.lastName).to.equal(fakeAdmin.lastName);
           done();
         });
     });
@@ -92,17 +93,6 @@ describe('Document Management System', () => {
         .set('Authorization', fakeAdminToken)
         .end((err, res) => {
           expect(res.status).to.equal(302);
-          done();
-        });
-    });
-
-    it('should return created user valid firstName', (done) => {
-      request(app)
-        .get('/api/user')
-        .set('Authorization', fakeUserToken)
-        .expect(200)
-        .end((err, res) => {
-          expect(res.body.name.firstName).to.equal(fakeUser.firstName);
           done();
         });
     });
@@ -123,7 +113,7 @@ describe('Document Management System', () => {
         .set('Authorization', fakeAdminToken)
         .expect(200)
         .end((err, res) => {
-          expect({}.hasOwnProperty.call(res.body, 'roleId')).to.be.true;
+          expect(res.body.roleId).to.be.defined;
           done();
         });
     });

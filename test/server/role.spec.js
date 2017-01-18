@@ -85,23 +85,52 @@ describe('Roles', () => {
 
     it('should return success for admin role', (done) => {
       request(app)
-      .get('/api/role?title=Admin')
-      .set('Authorization', fakeAdminToken)
-      .end((err, res) => {
-        expect(res.status).to.equal(201);
-        done();
-      });
+        .get('/api/role?title=Admin')
+        .set('Authorization', fakeAdminToken)
+        .end((err, res) => {
+          expect(res.status).to.equal(201);
+          done();
+        });
     });
 
     it('should return success for regular role', (done) => {
       request(app)
-      .get('/api/role?title=Regular')
+        .get('/api/role?title=Regular')
+        .set('Authorization', fakeAdminToken)
+        .end((err, res) => {
+          expect(res.status).to.equal(201);
+          done();
+        });
+    });
+  });
+
+  it('should allow admin delete role', (done) => {
+    request(app)
+      .delete('/api/role/2')
       .set('Authorization', fakeAdminToken)
       .end((err, res) => {
-        expect(res.status).to.equal(201);
+        expect(res.status).to.equal(200);
         done();
       });
-    });
+  });
+
+  it('should not allow unauthorized user delete role', (done) => {
+    request(app)
+      .delete('/api/role/3')
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+  });
+
+  it('should return not found for non existing role', (done) => {
+    request(app)
+      .delete('/api/role/3')
+      .set('Authorization', fakeAdminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
+        done();
+      });
   });
 
   after(() =>
