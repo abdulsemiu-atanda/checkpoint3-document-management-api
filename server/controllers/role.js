@@ -56,6 +56,34 @@ class Role {
       res.status(402).send({ message: 'You are not an Admin' });
     }
   }
+
+  /**
+     * Method that handles retrieving roles
+     * @param {Object} req
+     * @param {Object} res
+     * @return {Object} response with appropriate status message
+     */
+  static discard(req, res) {
+    const userDetails = Auth.verify(req.headers.authorization);
+    if (userDetails.roleId !== 1 || userDetails === false) {
+      res.status(401).send({ message: 'Invalid credentials' });
+      return false;
+    }
+    db.Role.destroy({
+      where: {
+        id: req.params.id
+      }
+    })
+      .then((result) => {
+        if (result === 1) {
+          res.status(200).send({
+            message: 'Role successfully deleted'
+          });
+        } else {
+          res.status(404).send({ message: 'Role does not exist' });
+        }
+      });
+  }
 }
 
 export default Role;
