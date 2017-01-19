@@ -67,21 +67,21 @@ describe('GET /document', () => {
 
   it('should return document of specified user', (done) => {
     request(app)
-    .get('/api/user/1/document')
-    .set('Authorization', adminToken)
-    .end((err, res) => {
-      expect(res.body.title).to.equal(fakeAdminDocument.title);
-      done();
-    });
+      .get('/api/user/1/document')
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.body.title).to.equal(fakeAdminDocument.title);
+        done();
+      });
   });
 
   it('should return correct status code for unauthorized requests', (done) => {
     request(app)
-    .get('/api/user/1/document')
-    .end((err, res) => {
-      expect(res.status).to.equal(401);
-      done();
-    });
+      .get('/api/user/1/document')
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
   });
 
   it('should return error status code for unauthorized requests', (done) => {
@@ -103,14 +103,43 @@ describe('GET /document', () => {
       });
   });
 
+  it('should return unauthorized for access without credentials', (done) => {
+    request(app)
+      .get('/api/document/Admin')
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+  });
+
+  it('should return documents that can be accessed by specified role', (done) => {
+    request(app)
+      .get('/api/document/Regular')
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        done();
+      });
+  });
+
+  it('should return documents that can be accessed by admin role', (done) => {
+    request(app)
+      .get('/api/document/Admin')
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        done();
+      });
+  });
+
   it('should order document when specified', (done) => {
     request(app)
-    .get('/api/document?order=order')
-    .set('Authorization', userToken)
-    .end((err, res) => {
-      expect(res.status).to.equal(200);
-      done();
-    });
+      .get('/api/document?order=order')
+      .set('Authorization', userToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        done();
+      });
   });
 
   it('should return error status code for unauthorized requests', (done) => {

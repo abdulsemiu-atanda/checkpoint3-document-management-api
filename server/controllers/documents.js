@@ -116,6 +116,35 @@ class DocumentController {
     });
   }
   /**
+   * Method that handles request for fetching role documents
+   * @param {Object} req
+   * @param {Object} res
+   * @return {Object} response
+   */
+  static access(req, res) {
+    const decoded = Auth.verify(req.headers.authorization);
+    if (decoded === false) {
+      res.status(401).send({ message: 'Invalid credentials' });
+      return false;
+    } else if (/admin/i.test(req.params.role)) {
+      db.Document.all()
+      .then(docs => {
+        res.status(200).send(docs);
+      });
+    } else {
+      db.Document.findAll({
+        where: {
+          $or: [
+            { OwnerId: decoded.id },
+            { access: 'public' }
+          ]
+        }
+      }).then(docs => {
+        res.status(200).send(docs);
+      });
+    }
+  }
+  /**
    * Method that handles request for deleting documents
    * @param {Object} req
    * @param {Object} res
