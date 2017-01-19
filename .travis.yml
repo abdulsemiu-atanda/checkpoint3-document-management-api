@@ -1,0 +1,26 @@
+sudo: required
+dist: trusty
+language: node_js
+
+node_js:
+  - node
+
+services:
+  - postgresql
+
+before_script:
+  - psql -c 'drop database if exists testdb;' -U postgres
+  - psql -c 'create database testdb;' -U postgres
+  - NODE_ENV=test npm run migrations
+  - NODE_ENV=test npm run seed
+
+
+script:
+  - NODE_ENV=test npm test
+  - NODE_ENV=test npm run model
+
+after_script:
+ - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+
+addons:
+  postgresql: "9.3"
