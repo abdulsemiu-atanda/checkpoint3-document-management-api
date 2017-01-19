@@ -61,7 +61,7 @@ describe('Document Management System', () => {
         .get('/api/user')
         .expect(401)
         .then((res) => {
-          expect(res.body.message).to.equal('No credentials were provided');
+          expect(res.body.message).to.equal('You are not logged in');
           done();
         });
     });
@@ -81,8 +81,8 @@ describe('Document Management System', () => {
         .set('Authorization', fakeAdminToken)
         .expect(200)
         .end((err, res) => {
-          expect(res.body.name.firstName).to.equal(fakeAdmin.firstName);
-          expect(res.body.name.lastName).to.equal(fakeAdmin.lastName);
+          expect(res.body[0].firstName).to.equal(fakeAdmin.firstName);
+          expect(res.body[0].lastName).to.equal(fakeAdmin.lastName);
           done();
         });
     });
