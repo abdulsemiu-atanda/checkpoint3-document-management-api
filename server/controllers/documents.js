@@ -13,10 +13,6 @@ class DocumentController {
    */
   static create(req, res) {
     const decoded = Auth.verify(req.headers.authorization);
-    if (decoded === false) {
-      res.status(401).send({ message: 'Unauthorized request' });
-      return false;
-    }
     db.Document.create({
       title: req.body.title,
       content: req.body.content,
@@ -39,10 +35,7 @@ class DocumentController {
    */
   static list(req, res) {
     const decoded = Auth.verify(req.headers.authorization);
-    if (decoded === false) {
-      res.status(401).send({ message: 'Invalid credentials' });
-      return false;
-    } else if (req.query.order === undefined && req.query.limit === undefined) {
+    if (req.query.order === undefined && req.query.limit === undefined) {
       db.Document.findAll({
         where: {
           $or: [
@@ -77,11 +70,6 @@ class DocumentController {
      * @return {Object} response
      */
   static fetchUserDoc(req, res) {
-    const decoded = Auth.verify(req.headers.authorization);
-    if (decoded === false) {
-      res.status(401).send({ message: 'Invalid credentials' });
-      return false;
-    }
     db.Document.findAll({
       where: {
         OwnerId: req.params.id
@@ -98,22 +86,17 @@ class DocumentController {
    * @return {Object} response
    */
   static update(req, res) {
-    const userDetail = Auth.verify(req.headers.authorization);
-    if (userDetail === false) {
-      res.status(401).send({ message: 'You are not authorized' });
-      return false;
-    }
     db.Document.findOne({
       where: {
         id: req.params.id
       }
     })
-    .then(document => {
-      document.update(req.body)
-      .then(result => {
-        res.status(202).send(result);
+      .then(document => {
+        document.update(req.body)
+          .then(result => {
+            res.status(202).send(result);
+          });
       });
-    });
   }
   /**
    * Method that handles request for fetching role documents
@@ -123,14 +106,11 @@ class DocumentController {
    */
   static access(req, res) {
     const decoded = Auth.verify(req.headers.authorization);
-    if (decoded === false) {
-      res.status(401).send({ message: 'Invalid credentials' });
-      return false;
-    } else if (/admin/i.test(req.params.role)) {
+    if (/admin/i.test(req.params.role)) {
       db.Document.all()
-      .then(docs => {
-        res.status(200).send(docs);
-      });
+        .then(docs => {
+          res.status(200).send(docs);
+        });
     } else {
       db.Document.findAll({
         where: {
@@ -151,11 +131,6 @@ class DocumentController {
    * @return {Object} response
    */
   static discard(req, res) {
-    const decoded = Auth.verify(req.headers.authorization);
-    if (decoded === false) {
-      res.status(401).send({ message: 'Invalid credentials' });
-      return false;
-    }
     db.Document.destroy({
       where: {
         id: req.query.id

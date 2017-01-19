@@ -131,25 +131,13 @@ class User {
    * @return {Object} response with status and decoded token or error
    */
   static fetchDetails(req, res) {
-    const userDetails = Auth.verify(req.headers.authorization);
-    if (req.headers.authorization === undefined || userDetails === false) {
-      res.status(401).send({ message: 'No credentials were provided' });
-      return false;
-    } else if (req.query.id === undefined) {
+    if (req.query.id === undefined) {
       db.User.findAll({
-        where: {
-          password: userDetails.password
-        }
-      }).spread(result => res.status(302).send({
-        id: result.id,
-        name: {
-          firstName: result.firstName,
-          lastName: result.lastName
-        },
-        email: result.email,
-        password: result.password,
-        roleId: result.RoleId
-      }));
+        attributes: ['id', 'firstName', 'lastName', 'email', 'RoleId']
+      })
+        .then(result => {
+          res.status(200).send(result);
+        });
     } else {
       db.User.findOne({
         where: {
@@ -174,11 +162,6 @@ class User {
    * @return {Object} response with status and decoded token or error
    */
   static discard(req, res) {
-    const userDetails = Auth.verify(req.headers.authorization);
-    if (userDetails.roleId !== 1 || userDetails === false) {
-      res.status(401).send({ message: 'Invalid credentials' });
-      return false;
-    }
     db.User.destroy({
       where: {
         id: req.query.id
