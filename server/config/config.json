@@ -1,25 +1,16 @@
 {
   "development": {
-    "username": "root",
-    "password": "password",
-    "database": "todos-dev",
-    "host": "127.0.0.1",
-    "dialect": "postgres"
+    "username": null,
+    "password": null,
+    "database": "todos-dev"
   },
   "test": {
     "username": null,
     "password": null,
-    "database": "testdb",
-    "host": "127.0.0.1",
     "dialect": "postgres",
     "logging": false
   },
   "production": {
-    "use_env_variable": "DATABASE_URL",
-    "username": null,
-    "password": null,
-    "database": "df10uj32gj69b5",
-    "host": "ec2-184-72-246-219.compute-1.amazonaws.com",
-    "dialect": "postgres"
+    "use_env_variable": "DATABASE_URL"
   }
 }
