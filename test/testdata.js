@@ -42,6 +42,14 @@ const testdata = {
     password: 'password',
     RoleId: 2
   },
+  fakeMailUser: {
+    firstName: 'Sam',
+    lastName: 'Winchester',
+    username: 'sam.winchester',
+    email: 'sam.winchester',
+    password: 'password',
+    RoleId: 2
+  },
   modelDoc: {
     title: 'Brown Fox',
     content: 'The Quick Brown Fox jumps over the lazy dog',

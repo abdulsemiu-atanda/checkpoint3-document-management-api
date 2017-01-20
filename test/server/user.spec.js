@@ -10,6 +10,7 @@ const fakeAdmin = testdata.fakeAdmin;
 const wrongPassword = { username: fakeAdmin.username, password: 'julio' };
 const adminCredentials = { username: fakeAdmin.username, password: fakeAdmin.password }
 const newAttribute = { firstName: 'Julianna' };
+const invalidMail = testdata.fakeMailUser;
 const userId = 2;
 
 describe('Document Management System', () => {
@@ -159,11 +160,11 @@ describe('Document Management System', () => {
         });
     });
 
-    it('should return correct status code for recreating user', (done) => {
+    it('should return bad request for invalid email', (done) => {
       request(app)
-        .post('/api/user').send(fakeUser)
+        .post('/api/user').send(invalidMail)
         .end((err, res) => {
-          expect(res.status).to.equal(409);
+          expect(res.status).to.equal(400);
           done();
         });
     });
