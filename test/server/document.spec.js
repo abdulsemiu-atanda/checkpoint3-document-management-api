@@ -214,6 +214,16 @@ describe('GET /document', () => {
       });
   });
 
+  it('should allow pagination', (done) => {
+    request(app)
+      .get('/api/document?page=3')
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.body.length).to.equal(0);
+        done();
+      });
+  });
+
   it('should return bad request for negative limit', (done) => {
     request(app)
       .get('/api/document?limit=-1')
