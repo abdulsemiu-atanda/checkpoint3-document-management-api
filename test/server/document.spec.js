@@ -102,7 +102,6 @@ describe('GET /document', () => {
       .get('/api/document')
       .set('Authorization', userToken)
       .end((err, res) => {
-        console.log(res.body);
         expect(res.body.length).to.equal(2);
         done();
       });

@@ -35,9 +35,9 @@ class DocumentController {
    */
   static list(req, res) {
     const decoded = Auth.verify(req.headers.authorization);
-    if (req.query.order || req.query.limit) {
+    if (req.query.order || req.query.limit || req.query.page) {
       if (req.query.limit < 0) {
-        res.status(400).send({ message: 'Only positive integers can be id' });
+        res.status(400).send({ message: 'Invalid negative value' });
       } else {
         db.Document.findAll({
           order: '"createdAt" DESC',
@@ -47,7 +47,8 @@ class DocumentController {
               { access: 'public' }
             ]
           },
-          limit: req.query.limit || 5
+          limit: req.query.limit || 5,
+          offset: req.query.page
         })
           .then((docs) => {
             res.status(200).send(docs);
@@ -73,7 +74,7 @@ class DocumentController {
         where: {
           $or: [
             { OwnerId: decoded.id },
-            { access: 'public' }
+            { access: 'public' || 'role' }
           ]
         }
       })
