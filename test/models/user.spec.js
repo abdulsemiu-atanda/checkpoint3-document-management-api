@@ -1,4 +1,5 @@
 import chai from 'chai';
+import bcrypt from 'bcrypt'
 import db from '../../server/models';
 import testdata from '../testdata';
 
@@ -32,6 +33,7 @@ describe('User Model', () => {
       expect(saveUser.username).to.equal(newUser.username);
       expect(saveUser.lastName).to.equal(newUser.lastName);
       expect(saveUser.password).to.not.equal(newUser.password);
+      expect(bcrypt.compareSync(newUser.password, saveUser.password)).to.be.true;
     });
   });
 
