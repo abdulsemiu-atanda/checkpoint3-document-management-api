@@ -23,6 +23,11 @@ const testdata = {
     title: 'Scooby Doo',
     content: 'Scooby Doo is an awesome dog who loves chewing bones'
   },
+  privateDoc: {
+    title: 'Silly',
+    content: 'Scooby Doo is an awesome dog who loves chewing bones',
+    access: 'private'
+  },
   role: {
     title: 'Admin'
   },
