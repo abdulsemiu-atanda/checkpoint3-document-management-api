@@ -173,6 +173,26 @@ describe('GET /document', () => {
       });
   });
 
+  it('should limit document when specified', (done) => {
+    request(app)
+      .get('/api/document?limit=1')
+      .set('Authorization', userToken)
+      .end((err, res) => {
+        expect(res.body.length).to.equal(1);
+        done();
+      });
+  });
+
+  it('should return bad request for negative limit', (done) => {
+    request(app)
+      .get('/api/document?limit=-1')
+      .set('Authorization', userToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+        done();
+      });
+  });
+
   it('should return error status code for unauthorized requests', (done) => {
     request(app)
       .get('/api/document')

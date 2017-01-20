@@ -36,19 +36,23 @@ class DocumentController {
   static list(req, res) {
     const decoded = Auth.verify(req.headers.authorization);
     if (req.query.order || req.query.limit) {
-      db.Document.findAll({
-        order: '"createdAt" DESC',
-        where: {
-          $or: [
-            { OwnerId: decoded.id },
-            { access: 'public' }
-          ]
-        },
-        limit: req.query.limit || 5
-      })
-        .then((docs) => {
-          res.status(200).send(docs);
-        });
+      if (req.query.limit < 0) {
+        res.status(400).send({ message: 'Only positive integers can be id' });
+      } else {
+        db.Document.findAll({
+          order: '"createdAt" DESC',
+          where: {
+            $or: [
+              { OwnerId: decoded.id },
+              { access: 'public' }
+            ]
+          },
+          limit: req.query.limit || 5
+        })
+          .then((docs) => {
+            res.status(200).send(docs);
+          });
+      }
     } else if (req.query.date) {
       db.Document.findAll({
         where: {
