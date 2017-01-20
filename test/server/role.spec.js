@@ -37,7 +37,7 @@ describe('Roles', () => {
         .get('/api/role')
         .set('Authorization', fakeUserToken)
         .end((err, res) => {
-          expect(res.body.message).to.equal('You are not an admin');
+          expect(res.body.message).to.equal('Invalid access level');
           expect(res.status).to.equal(401);
           done();
         });

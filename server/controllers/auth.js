@@ -31,7 +31,7 @@ class Authentication {
   static adminUser(req, res, next) {
     const adminUser = Authentication.verify(req.headers.authorization);
     if (adminUser === false || adminUser.roleId !== 1) {
-      res.status(401).send({ message: 'You are not an admin' });
+      res.status(401).send({ message: 'Invalid access level' });
     } else {
       next();
     }

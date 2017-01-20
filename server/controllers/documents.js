@@ -63,6 +63,11 @@ class DocumentController {
       }).then(result => {
         res.status(200).send(result);
       });
+    } else if (decoded.roleId === 1) {
+      db.Document.all()
+      .then(documents => {
+        res.status(200).send(documents);
+      });
     } else {
       db.Document.findAll({
         where: {

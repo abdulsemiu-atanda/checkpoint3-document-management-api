@@ -9,6 +9,7 @@ const fakeUser = testdata.fakeUser;
 const fakeAdmin = testdata.fakeAdmin;
 const fakeAdminDocument = testdata.fakeAdminDoc;
 const fakeUserDocument = testdata.fakeUserDoc;
+const privateDoc = testdata.privateDoc;
 const testDate = '2017-01-23';
 const docId = 1;
 const newDocTitle = { title: 'Sweet Talker' };
@@ -66,12 +67,43 @@ describe('GET /document', () => {
       });
   });
 
+  it('should create new document', (done) => {
+    request(app)
+      .post('/api/document').send(privateDoc)
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(201);
+        done();
+      });
+  });
+
   it('should return document created on specified date', (done) => {
     request(app)
       .get(`/api/document?date=${testDate}`)
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.status).to.equal(200);
+        done();
+      });
+  });
+
+  it('should return document of specified user', (done) => {
+    request(app)
+      .get('/api/document')
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.body.length).to.equal(3);
+        done();
+      });
+  });
+
+  it('should not return all documents to non admin user', (done) => {
+    request(app)
+      .get('/api/document')
+      .set('Authorization', userToken)
+      .end((err, res) => {
+        console.log(res.body);
+        expect(res.body.length).to.equal(2);
         done();
       });
   });
