@@ -62,20 +62,11 @@ class User {
       }
     })
       .then(user => {
-        user.update(req.body).then((result) => {
-          const newToken = jwt.sign({
-            id: result.id,
-            firstName: result.firstName,
-            lastName: result.lastName,
-            email: result.email,
-            username: result.username,
-            password: result.password,
-            roleId: result.RoleId
-          }, secret, { expiresIn: '24h' });
+        user.update(req.body).then((response) => {
           return res.status(200)
             .send({
               message: 'user attribute has been updated',
-              token: newToken
+              newDetails: response
             });
         });
       });
@@ -89,11 +80,11 @@ class User {
   static login(req, res) {
     db.User.findOne({
       where: {
-        username: req.query.username
+        username: req.body.username
       }
     })
       .then(result => {
-        bcrypt.compare(req.query.password, result.password, (err, response) => {
+        bcrypt.compare(req.body.password, result.password, (err, response) => {
           if (response) {
             const newToken = jwt.sign({
               id: result.id,

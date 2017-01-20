@@ -133,6 +133,16 @@ describe('Roles', () => {
       });
   });
 
+  it('should return bad request for negative id', (done) => {
+    request(app)
+      .delete('/api/role/-3')
+      .set('Authorization', fakeAdminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+        done();
+      });
+  });
+
   after(() =>
     db.Role.sync({ force: true })
   );

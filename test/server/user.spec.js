@@ -5,9 +5,10 @@ import db from '../../server/models';
 import testdata from '../testdata';
 
 const expect = chai.expect;
-const wrongPassword = 'julio';
 const fakeUser = testdata.fakeUser;
 const fakeAdmin = testdata.fakeAdmin;
+const wrongPassword = { username: fakeAdmin.username, password: 'julio' };
+const adminCredentials = { username: fakeAdmin.username, password: fakeAdmin.password }
 const newAttribute = { firstName: 'Julianna' };
 const userId = 2;
 
@@ -120,19 +121,10 @@ describe('Document Management System', () => {
 
     it('should return success mesage after login', (done) => {
       request(app)
-        .get(`/api/user/login?username=${fakeAdmin.username}&password=${fakeAdmin.password}`)
+        .post('/api/user/login').send(adminCredentials)
         .expect(200)
         .end((err, res) => {
           expect(res.body.message).to.equal('Login was successful');
-          done();
-        });
-    });
-
-    it('should return correct status code after successful login', (done) => {
-      request(app)
-        .get(`/api/user/login?username=${fakeAdmin.username}&password=${fakeAdmin.password}`)
-        .expect(200)
-        .end((err, res) => {
           expect(res.status).to.equal(200);
           done();
         });
@@ -140,7 +132,7 @@ describe('Document Management System', () => {
 
     it('should return correct message and status code for wrong credentials', (done) => {
       request(app)
-        .get(`/api/user/login?username=${fakeUser.username}&password=${wrongPassword}`)
+        .post('/api/user/login').send(wrongPassword)
         .end((err, res) => {
           expect(res.body.message).to.equal('Username or password incorrect');
           expect(res.status).to.equal(400);

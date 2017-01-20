@@ -1,4 +1,3 @@
-import Auth from './auth';
 import db from '../models';
 
 /**
@@ -54,20 +53,24 @@ class Role {
      * @return {Object} response with appropriate status message
      */
   static discard(req, res) {
-    db.Role.destroy({
-      where: {
-        id: req.params.id
-      }
-    })
-      .then((result) => {
-        if (result === 1) {
-          res.status(200).send({
-            message: 'Role successfully deleted'
-          });
-        } else {
-          res.status(404).send({ message: 'Role does not exist' });
+    if (req.params.id <= 0) {
+      res.status(400).send({ message: 'Only positive integers can be id' });
+    } else {
+      db.Role.destroy({
+        where: {
+          id: req.params.id
         }
-      });
+      })
+        .then((result) => {
+          if (result === 1) {
+            res.status(200).send({
+              message: 'Role successfully deleted'
+            });
+          } else {
+            res.status(404).send({ message: 'Role does not exist' });
+          }
+        });
+    }
   }
 }
 

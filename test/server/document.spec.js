@@ -9,6 +9,7 @@ const fakeUser = testdata.fakeUser;
 const fakeAdmin = testdata.fakeAdmin;
 const fakeAdminDocument = testdata.fakeAdminDoc;
 const fakeUserDocument = testdata.fakeUserDoc;
+const testDate = '2017-01-23';
 const docId = 1;
 const newDocTitle = { title: 'Sweet Talker' };
 let adminToken;
@@ -65,12 +66,42 @@ describe('GET /document', () => {
       });
   });
 
+  it('should return document created on specified date', (done) => {
+    request(app)
+      .get(`/api/document?date=${testDate}`)
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        done();
+      });
+  });
+
   it('should return document of specified user', (done) => {
     request(app)
       .get('/api/user/1/document')
       .set('Authorization', adminToken)
       .end((err, res) => {
-        expect(res.body.title).to.equal(fakeAdminDocument.title);
+        expect(res.body[0].title).to.equal(fakeAdminDocument.title);
+        done();
+      });
+  });
+
+  it('should return bad request for non positive integer id', (done) => {
+    request(app)
+      .get('/api/user/-1/document')
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+        done();
+      });
+  });
+
+    it('should return not found for non existing user document', (done) => {
+    request(app)
+      .get('/api/user/7/document')
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
         done();
       });
   });
@@ -157,6 +188,16 @@ describe('GET /document', () => {
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.body.title).to.equal(newDocTitle.title);
+        done();
+      });
+  });
+
+  it('should return correct updated attribute', (done) => {
+    request(app)
+      .put('/api/document/-1').send(newDocTitle)
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
         done();
       });
   });

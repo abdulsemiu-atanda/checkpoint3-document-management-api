@@ -35,19 +35,7 @@ class DocumentController {
    */
   static list(req, res) {
     const decoded = Auth.verify(req.headers.authorization);
-    if (req.query.order === undefined && req.query.limit === undefined) {
-      db.Document.findAll({
-        where: {
-          $or: [
-            { OwnerId: decoded.id },
-            { access: 'public' }
-          ]
-        }
-      })
-        .then(docs => {
-          res.status(200).send(docs);
-        });
-    } else {
+    if (req.query.order || req.query.limit) {
       db.Document.findAll({
         order: '"createdAt" DESC',
         where: {
@@ -61,6 +49,28 @@ class DocumentController {
         .then((docs) => {
           res.status(200).send(docs);
         });
+    } else if (req.query.date) {
+      db.Document.findAll({
+        where: {
+          createdAt: {
+            $lte: new Date(req.query.date)
+          }
+        }
+      }).then(result => {
+        res.status(200).send(result);
+      });
+    } else {
+      db.Document.findAll({
+        where: {
+          $or: [
+            { OwnerId: decoded.id },
+            { access: 'public' }
+          ]
+        }
+      })
+        .then(docs => {
+          res.status(200).send(docs);
+        });
     }
   }
   /**
@@ -70,13 +80,24 @@ class DocumentController {
      * @return {Object} response
      */
   static fetchUserDoc(req, res) {
+    const convert = parseInt(req.params.id, 10);
+    if (req.params.id < 0) {
+      res.status(400).send({
+        message: 'Only positive integers can be id'
+      });
+      return false;
+    }
     db.Document.findAll({
       where: {
-        OwnerId: req.params.id
+        OwnerId: convert
       }
     })
-      .spread(docs => {
-        res.status(200).send(docs);
+      .then(docs => {
+        if (docs.length > 0) {
+          res.status(200).send(docs);
+        } else {
+          res.status(404).send({ message: 'Document does not exist' });
+        }
       });
   }
   /**
@@ -86,17 +107,21 @@ class DocumentController {
    * @return {Object} response
    */
   static update(req, res) {
-    db.Document.findOne({
-      where: {
-        id: req.params.id
-      }
-    })
-      .then(document => {
-        document.update(req.body)
-          .then(result => {
-            res.status(202).send(result);
-          });
-      });
+    if (req.params.id < 0) {
+      res.status(400).send({ message: 'Only positive integers can be id' });
+    } else {
+      db.Document.findOne({
+        where: {
+          id: parseInt(req.params.id, 10)
+        }
+      })
+        .then(document => {
+          document.update(req.body)
+            .then(result => {
+              res.status(202).send(result);
+            });
+        });
+    }
   }
   /**
    * Method that handles request for fetching role documents
