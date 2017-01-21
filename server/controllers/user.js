@@ -127,13 +127,25 @@ class User {
    * @return {Object} response with status and decoded token or error
    */
   static fetchDetails(req, res) {
+    const detail = Auth.verify(req.headers.authorization);
     if (req.query.id === undefined) {
-      db.User.findAll({
-        attributes: ['id', 'firstName', 'lastName', 'email', 'RoleId']
-      })
-        .then(result => {
-          res.status(200).send(result);
+      if (detail.roleId !== 1) {
+        db.User.findOne({
+          where: {
+            id: detail.id
+          },
+          attributes: ['id', 'firstName', 'lastName', 'email', 'RoleId']
+        }).then(user => {
+          res.status(200).send(user);
         });
+      } else {
+        db.User.findAll({
+          attributes: ['id', 'firstName', 'lastName', 'email', 'RoleId']
+        })
+          .then(result => {
+            res.status(200).send(result);
+          });
+      }
     } else {
       db.User.findOne({
         where: {

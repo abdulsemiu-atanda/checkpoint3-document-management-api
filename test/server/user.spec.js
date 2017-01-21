@@ -89,6 +89,28 @@ describe('Document Management System', () => {
         });
     });
 
+    it('should not return all users to non admin user', (done) => {
+      request(app)
+        .get('/api/user')
+        .set('Authorization', fakeUserToken)
+        .expect(200)
+        .end((err, res) => {
+          expect(res.body.firstName).to.equal(fakeUser.firstName);
+          done();
+        });
+    });
+
+    it('should return all users to admin', (done) => {
+      request(app)
+        .get('/api/user')
+        .set('Authorization', fakeAdminToken)
+        .expect(200)
+        .end((err, res) => {
+          expect(res.body.length).to.equal(2);
+          done();
+        });
+    });
+
     it('should return success for fetching single user', (done) => {
       request(app)
         .get(`/api/user?id=${userId}`)
