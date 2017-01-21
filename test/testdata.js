@@ -28,6 +28,11 @@ const testdata = {
     content: 'Scooby Doo is an awesome dog who loves chewing bones',
     access: 'private'
   },
+  roleDoc: {
+    title: 'Sully',
+    content: 'Scooby Doo is an awesome dog who loves chewing bones',
+    access: 'role'
+  },
   role: {
     title: 'Admin'
   },
