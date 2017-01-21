@@ -83,7 +83,6 @@ describe('GET /document', () => {
       .post('/api/document').send(roleDoc)
       .set('Authorization', adminToken)
       .end((err, res) => {
-        console.log(res.body.length);
         expect(res.status).to.equal(201);
         done();
       });
