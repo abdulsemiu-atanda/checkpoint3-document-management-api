@@ -9,9 +9,7 @@ const config = require(`${__dirname}/../config/config.json`)[env];
 const basename = path.basename(module.filename);
 
 const db = {};
-const sequelize = (config.use_env_variable)
-  ? new Sequelize(process.env[config.use_env_variable])
-  : new Sequelize(process.env.DB_NAME, process.env.DB_USERNAME, process.env.DB_PASSWORD, config);
+const sequelize = new Sequelize(process.env[config.use_env_variable], config);
 
 
 fs
