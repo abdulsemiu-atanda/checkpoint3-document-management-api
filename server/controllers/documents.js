@@ -13,10 +13,6 @@ class DocumentController {
    */
   static create(req, res) {
     const decoded = Auth.verify(req.headers.authorization);
-    if (decoded === false) {
-      res.status(401).send({ message: 'Unauthorized request' });
-      return false;
-    }
     db.Document.create({
       title: req.body.title,
       content: req.body.content,
@@ -39,33 +35,50 @@ class DocumentController {
    */
   static list(req, res) {
     const decoded = Auth.verify(req.headers.authorization);
-    if (decoded === false) {
-      res.status(401).send({ message: 'Invalid credentials' });
-      return false;
-    } else if (req.query.order === undefined && req.query.limit === undefined) {
+    if (req.query.order || req.query.limit || req.query.page) {
+      if (req.query.limit < 0) {
+        res.status(400).send({ message: 'Invalid negative value' });
+      } else {
+        db.Document.findAll({
+          order: '"createdAt" DESC',
+          where: {
+            $or: [
+              { OwnerId: decoded.id },
+              { access: 'public' }
+            ]
+          },
+          limit: req.query.limit || 5,
+          offset: req.query.page
+        })
+          .then((docs) => {
+            res.status(200).send(docs);
+          });
+      }
+    } else if (req.query.date) {
+      db.Document.findAll({
+        where: {
+          createdAt: {
+            $lte: new Date(req.query.date)
+          }
+        }
+      }).then(result => {
+        res.status(200).send(result);
+      });
+    } else if (decoded.roleId === 1) {
+      db.Document.all()
+      .then(documents => {
+        res.status(200).send(documents);
+      });
+    } else {
       db.Document.findAll({
         where: {
           $or: [
             { OwnerId: decoded.id },
-            { access: 'public' }
+            { access: 'public' || 'role' }
           ]
         }
       })
         .then(docs => {
-          res.status(200).send(docs);
-        });
-    } else {
-      db.Document.findAll({
-        order: '"createdAt" DESC',
-        where: {
-          $or: [
-            { OwnerId: decoded.id },
-            { access: 'public' }
-          ]
-        },
-        limit: req.query.limit || 5
-      })
-        .then((docs) => {
           res.status(200).send(docs);
         });
     }
@@ -77,18 +90,24 @@ class DocumentController {
      * @return {Object} response
      */
   static fetchUserDoc(req, res) {
-    const decoded = Auth.verify(req.headers.authorization);
-    if (decoded === false) {
-      res.status(401).send({ message: 'Invalid credentials' });
+    const convert = parseInt(req.params.id, 10);
+    if (req.params.id < 0) {
+      res.status(400).send({
+        message: 'Only positive integers can be id'
+      });
       return false;
     }
     db.Document.findAll({
       where: {
-        OwnerId: req.params.id
+        OwnerId: convert
       }
     })
-      .spread(docs => {
-        res.status(200).send(docs);
+      .then(docs => {
+        if (docs.length > 0) {
+          res.status(200).send(docs);
+        } else {
+          res.status(404).send({ message: 'Document does not exist' });
+        }
       });
   }
   /**
@@ -98,22 +117,21 @@ class DocumentController {
    * @return {Object} response
    */
   static update(req, res) {
-    const userDetail = Auth.verify(req.headers.authorization);
-    if (userDetail === false) {
-      res.status(401).send({ message: 'You are not authorized' });
-      return false;
+    if (req.params.id < 0) {
+      res.status(400).send({ message: 'Only positive integers can be id' });
+    } else {
+      db.Document.findOne({
+        where: {
+          id: parseInt(req.params.id, 10)
+        }
+      })
+        .then(document => {
+          document.update(req.body)
+            .then(result => {
+              res.status(202).send(result);
+            });
+        });
     }
-    db.Document.findOne({
-      where: {
-        id: req.params.id
-      }
-    })
-    .then(document => {
-      document.update(req.body)
-      .then(result => {
-        res.status(202).send(result);
-      });
-    });
   }
   /**
    * Method that handles request for fetching role documents
@@ -123,14 +141,11 @@ class DocumentController {
    */
   static access(req, res) {
     const decoded = Auth.verify(req.headers.authorization);
-    if (decoded === false) {
-      res.status(401).send({ message: 'Invalid credentials' });
-      return false;
-    } else if (/admin/i.test(req.params.role)) {
+    if (/admin/i.test(req.params.role)) {
       db.Document.all()
-      .then(docs => {
-        res.status(200).send(docs);
-      });
+        .then(docs => {
+          res.status(200).send(docs);
+        });
     } else {
       db.Document.findAll({
         where: {
@@ -151,11 +166,6 @@ class DocumentController {
    * @return {Object} response
    */
   static discard(req, res) {
-    const decoded = Auth.verify(req.headers.authorization);
-    if (decoded === false) {
-      res.status(401).send({ message: 'Invalid credentials' });
-      return false;
-    }
     db.Document.destroy({
       where: {
         id: req.query.id

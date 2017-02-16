@@ -23,6 +23,16 @@ const testdata = {
     title: 'Scooby Doo',
     content: 'Scooby Doo is an awesome dog who loves chewing bones'
   },
+  privateDoc: {
+    title: 'Silly',
+    content: 'Scooby Doo is an awesome dog who loves chewing bones',
+    access: 'private'
+  },
+  roleDoc: {
+    title: 'Sully',
+    content: 'Scooby Doo is an awesome dog who loves chewing bones',
+    access: 'role'
+  },
   role: {
     title: 'Admin'
   },
@@ -39,6 +49,14 @@ const testdata = {
     lastName: 'Winchester',
     username: 'sam.winchester',
     email: 'sam.winchester@gmail.com',
+    password: 'password',
+    RoleId: 2
+  },
+  fakeMailUser: {
+    firstName: 'Sam',
+    lastName: 'Winchester',
+    username: 'sam.winchester',
+    email: 'sam.winchester',
     password: 'password',
     RoleId: 2
   },

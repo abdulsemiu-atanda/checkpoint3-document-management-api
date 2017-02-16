@@ -17,36 +17,41 @@ class User {
    * @return {Object} response with appropriate status
    */
   static create(req, res) {
-    db.User.findOrCreate({
-      where: {
-        email: req.body.email
-      },
-      defaults: {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        email: req.body.email,
-        username: req.body.username,
-        password: req.body.password,
-        RoleId: req.body.roleId
-      }
-    })
-      .spread((user, created) => {
-        if (created) {
-          const newToken = jwt.sign({
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            password: user.password,
-            roleId: user.RoleId
-          }, secret, { expiresIn: '24h' });
-          return res.status(201)
-            .send({
-              message: 'User created and token expires in a day',
-              token: newToken
-            });
+    const emailRegex = /^\S+@\S+$/g;
+    if (emailRegex.test(req.body.email)) {
+      db.User.findOrCreate({
+        where: {
+          email: req.body.email
+        },
+        defaults: {
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+          email: req.body.email,
+          username: req.body.username,
+          password: req.body.password,
+          RoleId: req.body.roleId
         }
-        return res.status(409).send({ message: 'User already exists' });
-      });
+      })
+        .spread((user, created) => {
+          if (created) {
+            const newToken = jwt.sign({
+              id: user.id,
+              username: user.username,
+              email: user.email,
+              password: user.password,
+              roleId: user.RoleId
+            }, secret, { expiresIn: '24h' });
+            return res.status(201)
+              .send({
+                message: 'User created and token expires in a day',
+                token: newToken
+              });
+          }
+          return res.status(409).send({ message: 'User already exists' });
+        });
+    } else {
+      res.status(400).send({ message: 'Invalid Email' });
+    }
   }
   /**
    * Methods that updates user attributes
@@ -62,20 +67,11 @@ class User {
       }
     })
       .then(user => {
-        user.update(req.body).then((result) => {
-          const newToken = jwt.sign({
-            id: result.id,
-            firstName: result.firstName,
-            lastName: result.lastName,
-            email: result.email,
-            username: result.username,
-            password: result.password,
-            roleId: result.RoleId
-          }, secret, { expiresIn: '24h' });
+        user.update(req.body).then((response) => {
           return res.status(200)
             .send({
               message: 'user attribute has been updated',
-              token: newToken
+              newDetails: response
             });
         });
       });
@@ -89,11 +85,11 @@ class User {
   static login(req, res) {
     db.User.findOne({
       where: {
-        username: req.query.username
+        username: req.body.username
       }
     })
       .then(result => {
-        bcrypt.compare(req.query.password, result.password, (err, response) => {
+        bcrypt.compare(req.body.password, result.password, (err, response) => {
           if (response) {
             const newToken = jwt.sign({
               id: result.id,
@@ -131,25 +127,25 @@ class User {
    * @return {Object} response with status and decoded token or error
    */
   static fetchDetails(req, res) {
-    const userDetails = Auth.verify(req.headers.authorization);
-    if (req.headers.authorization === undefined || userDetails === false) {
-      res.status(401).send({ message: 'No credentials were provided' });
-      return false;
-    } else if (req.query.id === undefined) {
-      db.User.findAll({
-        where: {
-          password: userDetails.password
-        }
-      }).spread(result => res.status(302).send({
-        id: result.id,
-        name: {
-          firstName: result.firstName,
-          lastName: result.lastName
-        },
-        email: result.email,
-        password: result.password,
-        roleId: result.RoleId
-      }));
+    const detail = Auth.verify(req.headers.authorization);
+    if (req.query.id === undefined) {
+      if (detail.roleId !== 1) {
+        db.User.findOne({
+          where: {
+            id: detail.id
+          },
+          attributes: ['id', 'firstName', 'lastName', 'email', 'RoleId']
+        }).then(user => {
+          res.status(200).send(user);
+        });
+      } else {
+        db.User.findAll({
+          attributes: ['id', 'firstName', 'lastName', 'email', 'RoleId']
+        })
+          .then(result => {
+            res.status(200).send(result);
+          });
+      }
     } else {
       db.User.findOne({
         where: {
@@ -174,11 +170,6 @@ class User {
    * @return {Object} response with status and decoded token or error
    */
   static discard(req, res) {
-    const userDetails = Auth.verify(req.headers.authorization);
-    if (userDetails.roleId !== 1 || userDetails === false) {
-      res.status(401).send({ message: 'Invalid credentials' });
-      return false;
-    }
     db.User.destroy({
       where: {
         id: req.query.id

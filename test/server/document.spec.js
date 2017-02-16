@@ -9,6 +9,9 @@ const fakeUser = testdata.fakeUser;
 const fakeAdmin = testdata.fakeAdmin;
 const fakeAdminDocument = testdata.fakeAdminDoc;
 const fakeUserDocument = testdata.fakeUserDoc;
+const privateDoc = testdata.privateDoc;
+const roleDoc = testdata.roleDoc;
+const testDate = '2017-01-23';
 const docId = 1;
 const newDocTitle = { title: 'Sweet Talker' };
 let adminToken;
@@ -65,12 +68,82 @@ describe('GET /document', () => {
       });
   });
 
+  it('should create new document', (done) => {
+    request(app)
+      .post('/api/document').send(privateDoc)
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(201);
+        done();
+      });
+  });
+
+  it('should create new document', (done) => {
+    request(app)
+      .post('/api/document').send(roleDoc)
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(201);
+        done();
+      });
+  });
+
+  it('should return document created on specified date', (done) => {
+    request(app)
+      .get(`/api/document?date=${testDate}`)
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        done();
+      });
+  });
+
+  it('should return document of specified user', (done) => {
+    request(app)
+      .get('/api/document')
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.body.length).to.equal(4);
+        done();
+      });
+  });
+
+  it('should not return all documents to non admin user and not user\'s role', (done) => {
+    request(app)
+      .get('/api/document')
+      .set('Authorization', userToken)
+      .end((err, res) => {
+        expect(res.body.length).to.equal(2);
+        done();
+      });
+  });
+
   it('should return document of specified user', (done) => {
     request(app)
       .get('/api/user/1/document')
       .set('Authorization', adminToken)
       .end((err, res) => {
-        expect(res.body.title).to.equal(fakeAdminDocument.title);
+        expect(res.body[0].title).to.equal(fakeAdminDocument.title);
+        done();
+      });
+  });
+
+  it('should return bad request for non positive integer id', (done) => {
+    request(app)
+      .get('/api/user/-1/document')
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+        done();
+      });
+  });
+
+    it('should return not found for non existing user document', (done) => {
+    request(app)
+      .get('/api/user/7/document')
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
         done();
       });
   });
@@ -142,6 +215,36 @@ describe('GET /document', () => {
       });
   });
 
+  it('should limit document when specified', (done) => {
+    request(app)
+      .get('/api/document?limit=1')
+      .set('Authorization', userToken)
+      .end((err, res) => {
+        expect(res.body.length).to.equal(1);
+        done();
+      });
+  });
+
+  it('should allow pagination', (done) => {
+    request(app)
+      .get('/api/document?page=3')
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.body.length).to.equal(1);
+        done();
+      });
+  });
+
+  it('should return bad request for negative limit', (done) => {
+    request(app)
+      .get('/api/document?limit=-1')
+      .set('Authorization', userToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+        done();
+      });
+  });
+
   it('should return error status code for unauthorized requests', (done) => {
     request(app)
       .get('/api/document')
@@ -157,6 +260,16 @@ describe('GET /document', () => {
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.body.title).to.equal(newDocTitle.title);
+        done();
+      });
+  });
+
+  it('should return correct updated attribute', (done) => {
+    request(app)
+      .put('/api/document/-1').send(newDocTitle)
+      .set('Authorization', adminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
         done();
       });
   });

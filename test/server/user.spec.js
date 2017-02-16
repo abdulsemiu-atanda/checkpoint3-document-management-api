@@ -5,10 +5,12 @@ import db from '../../server/models';
 import testdata from '../testdata';
 
 const expect = chai.expect;
-const wrongPassword = 'julio';
 const fakeUser = testdata.fakeUser;
 const fakeAdmin = testdata.fakeAdmin;
+const wrongPassword = { username: fakeAdmin.username, password: 'julio' };
+const adminCredentials = { username: fakeAdmin.username, password: fakeAdmin.password }
 const newAttribute = { firstName: 'Julianna' };
+const invalidMail = testdata.fakeMailUser;
 const userId = 2;
 
 describe('Document Management System', () => {
@@ -61,7 +63,7 @@ describe('Document Management System', () => {
         .get('/api/user')
         .expect(401)
         .then((res) => {
-          expect(res.body.message).to.equal('No credentials were provided');
+          expect(res.body.message).to.equal('You are not logged in');
           done();
         });
     });
@@ -81,8 +83,30 @@ describe('Document Management System', () => {
         .set('Authorization', fakeAdminToken)
         .expect(200)
         .end((err, res) => {
-          expect(res.body.name.firstName).to.equal(fakeAdmin.firstName);
-          expect(res.body.name.lastName).to.equal(fakeAdmin.lastName);
+          expect(res.body[0].firstName).to.equal(fakeAdmin.firstName);
+          expect(res.body[0].lastName).to.equal(fakeAdmin.lastName);
+          done();
+        });
+    });
+
+    it('should not return all users to non admin user', (done) => {
+      request(app)
+        .get('/api/user')
+        .set('Authorization', fakeUserToken)
+        .expect(200)
+        .end((err, res) => {
+          expect(res.body.firstName).to.equal(fakeUser.firstName);
+          done();
+        });
+    });
+
+    it('should return all users to admin', (done) => {
+      request(app)
+        .get('/api/user')
+        .set('Authorization', fakeAdminToken)
+        .expect(200)
+        .end((err, res) => {
+          expect(res.body.length).to.equal(2);
           done();
         });
     });
@@ -120,19 +144,10 @@ describe('Document Management System', () => {
 
     it('should return success mesage after login', (done) => {
       request(app)
-        .get(`/api/user/login?username=${fakeAdmin.username}&password=${fakeAdmin.password}`)
+        .post('/api/user/login').send(adminCredentials)
         .expect(200)
         .end((err, res) => {
           expect(res.body.message).to.equal('Login was successful');
-          done();
-        });
-    });
-
-    it('should return correct status code after successful login', (done) => {
-      request(app)
-        .get(`/api/user/login?username=${fakeAdmin.username}&password=${fakeAdmin.password}`)
-        .expect(200)
-        .end((err, res) => {
           expect(res.status).to.equal(200);
           done();
         });
@@ -140,7 +155,7 @@ describe('Document Management System', () => {
 
     it('should return correct message and status code for wrong credentials', (done) => {
       request(app)
-        .get(`/api/user/login?username=${fakeUser.username}&password=${wrongPassword}`)
+        .post('/api/user/login').send(wrongPassword)
         .end((err, res) => {
           expect(res.body.message).to.equal('Username or password incorrect');
           expect(res.status).to.equal(400);
@@ -167,11 +182,11 @@ describe('Document Management System', () => {
         });
     });
 
-    it('should return correct status code for recreating user', (done) => {
+    it('should return bad request for invalid email', (done) => {
       request(app)
-        .post('/api/user').send(fakeUser)
+        .post('/api/user').send(invalidMail)
         .end((err, res) => {
-          expect(res.status).to.equal(409);
+          expect(res.status).to.equal(400);
           done();
         });
     });

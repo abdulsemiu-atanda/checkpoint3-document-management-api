@@ -37,8 +37,8 @@ describe('Roles', () => {
         .get('/api/role')
         .set('Authorization', fakeUserToken)
         .end((err, res) => {
-          expect(res.body.message).to.equal('You are not an Admin');
-          expect(res.status).to.equal(402);
+          expect(res.body.message).to.equal('Invalid access level');
+          expect(res.status).to.equal(401);
           done();
         });
     });
@@ -129,6 +129,16 @@ describe('Roles', () => {
       .set('Authorization', fakeAdminToken)
       .end((err, res) => {
         expect(res.status).to.equal(404);
+        done();
+      });
+  });
+
+  it('should return bad request for negative id', (done) => {
+    request(app)
+      .delete('/api/role/-3')
+      .set('Authorization', fakeAdminToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
         done();
       });
   });
