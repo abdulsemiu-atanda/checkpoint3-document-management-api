@@ -1,13 +1,14 @@
 /* eslint no-console: "off" */
 import express from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import route from './server/routes';
 
 // Set up the express app
 const app = express();
 const port = process.env.PORT || 3000;
 
-
+app.use(cors());
 // Parse incoming requests data (https://github.com/expressjs/body-parser)
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
