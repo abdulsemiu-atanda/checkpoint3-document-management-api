@@ -104,4 +104,4 @@ To contribute to this project you can do the following:
 - Submit a pull request
 
 ## Contributors
-- [Abdulsemiu Atanda](https://github.com/andela-aatanda)
+- [Abdulsemiu Atanda](https://github.com/abdulsemiu-atanda)
