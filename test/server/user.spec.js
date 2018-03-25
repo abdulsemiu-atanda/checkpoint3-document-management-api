@@ -27,11 +27,11 @@ describe('Document Management System', () => {
     }]);
     db.User.sync({ force: true }).then(() => {
       request(app)
-        .post('/api/user').send(fakeAdmin)
+        .post('/api/v1/user').send(fakeAdmin)
         .then(res => {
           fakeAdminToken = res.body.token;
           request(app)
-            .post('/api/user').send(fakeUser)
+            .post('/api/v1/user').send(fakeUser)
             .then(response => {
               fakeUserToken = response.body.token;
               done();
@@ -60,7 +60,7 @@ describe('Document Management System', () => {
     });
     it('should return message for unauthorized user', (done) => {
       request(app)
-        .get('/api/user')
+        .get('/api/v1/user')
         .expect(401)
         .then((res) => {
           expect(res.body.message).to.equal('You are not logged in');
@@ -70,7 +70,7 @@ describe('Document Management System', () => {
 
     it('should return correct status code for unauthorized user', (done) => {
       request(app)
-        .get('/api/user')
+        .get('/api/v1/user')
         .then((res) => {
           expect(res.status).to.equal(401);
           done();
@@ -79,7 +79,7 @@ describe('Document Management System', () => {
 
     it('should return created user valid firstName and lastName', (done) => {
       request(app)
-        .get('/api/user')
+        .get('/api/v1/user')
         .set('Authorization', fakeAdminToken)
         .expect(200)
         .end((err, res) => {
@@ -91,7 +91,7 @@ describe('Document Management System', () => {
 
     it('should not return all users to non admin user', (done) => {
       request(app)
-        .get('/api/user')
+        .get('/api/v1/user')
         .set('Authorization', fakeUserToken)
         .expect(200)
         .end((err, res) => {
@@ -102,7 +102,7 @@ describe('Document Management System', () => {
 
     it('should return all users to admin', (done) => {
       request(app)
-        .get('/api/user')
+        .get('/api/v1/user')
         .set('Authorization', fakeAdminToken)
         .expect(200)
         .end((err, res) => {
@@ -113,7 +113,7 @@ describe('Document Management System', () => {
 
     it('should return success for fetching single user', (done) => {
       request(app)
-        .get(`/api/user?id=${userId}`)
+        .get(`/api/v1/user?id=${userId}`)
         .set('Authorization', fakeAdminToken)
         .end((err, res) => {
           expect(res.status).to.equal(302);
@@ -123,7 +123,7 @@ describe('Document Management System', () => {
 
     it('should return correct status code for attribute update', (done) => {
       request(app)
-        .put('/api/user').send(newAttribute)
+        .put('/api/v1/user').send(newAttribute)
         .set('Authorization', fakeUserToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
@@ -133,7 +133,7 @@ describe('Document Management System', () => {
 
     it('should return created user with role', (done) => {
       request(app)
-        .get('/api/user')
+        .get('/api/v1/user')
         .set('Authorization', fakeAdminToken)
         .expect(200)
         .end((err, res) => {
@@ -144,7 +144,7 @@ describe('Document Management System', () => {
 
     it('should return success mesage after login', (done) => {
       request(app)
-        .post('/api/user/login').send(adminCredentials)
+        .post('/api/v1/user/login').send(adminCredentials)
         .expect(200)
         .end((err, res) => {
           expect(res.body.message).to.equal('Login was successful');
@@ -155,7 +155,7 @@ describe('Document Management System', () => {
 
     it('should return correct message and status code for wrong credentials', (done) => {
       request(app)
-        .post('/api/user/login').send(wrongPassword)
+        .post('/api/v1/user/login').send(wrongPassword)
         .end((err, res) => {
           expect(res.body.message).to.equal('Username or password incorrect');
           expect(res.status).to.equal(400);
@@ -165,7 +165,7 @@ describe('Document Management System', () => {
 
     it('should return success status code when user logs out', (done) => {
       request(app)
-        .get('/api/user/logout')
+        .get('/api/v1/user/logout')
         .end((err, res) => {
           expect(res.status).to.equal(200);
           done();
@@ -175,7 +175,7 @@ describe('Document Management System', () => {
   describe('POST /user', () => {
     it('should return message when existing user create account', (done) => {
       request(app)
-        .post('/api/user').send(fakeUser)
+        .post('/api/v1/user').send(fakeUser)
         .end((err, res) => {
           expect(res.body.message).to.equal('User already exists');
           done();
@@ -184,7 +184,7 @@ describe('Document Management System', () => {
 
     it('should return bad request for invalid email', (done) => {
       request(app)
-        .post('/api/user').send(invalidMail)
+        .post('/api/v1/user').send(invalidMail)
         .end((err, res) => {
           expect(res.status).to.equal(400);
           done();
@@ -193,7 +193,7 @@ describe('Document Management System', () => {
 
     it('should return error status code for unauthorized user', (done) => {
       request(app)
-        .delete('/api/user?id=2')
+        .delete('/api/v1/user?id=2')
         .set('Authorization', fakeUserToken)
         .end((err, res) => {
           expect(res.status).to.equal(401);
@@ -203,7 +203,7 @@ describe('Document Management System', () => {
 
     it('should return success status code when admin deletes user', (done) => {
       request(app)
-        .delete(`/api/user?id=${userId}`)
+        .delete(`/api/v1/user?id=${userId}`)
         .set('Authorization', fakeAdminToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);

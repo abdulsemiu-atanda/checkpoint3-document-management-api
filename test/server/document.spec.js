@@ -22,11 +22,11 @@ describe('GET /document', () => {
     db.Document.sync({ force: true }).then(() => {
       return db.User.sync({ force: true }).then(() => {
         request(app)
-          .post('/api/user').send(fakeAdmin)
+          .post('/api/v1/user').send(fakeAdmin)
           .then(res => {
             adminToken = res.body.token;
             request(app)
-              .post('/api/user').send(fakeUser)
+              .post('/api/v1/user').send(fakeUser)
               .then(response => {
                 userToken = response.body.token;
                 done();
@@ -38,7 +38,7 @@ describe('GET /document', () => {
 
   it('should create document with published date and public access', (done) => {
     request(app)
-      .post('/api/document').send(fakeUserDocument)
+      .post('/api/v1/document').send(fakeUserDocument)
       .set('Authorization', userToken)
       .end((err, res) => {
         expect(res.status).to.equal(201);
@@ -50,7 +50,7 @@ describe('GET /document', () => {
 
   it('should return correct error status code for existing document', (done) => {
     request(app)
-      .post('/api/document').send(fakeUserDocument)
+      .post('/api/v1/document').send(fakeUserDocument)
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.status).to.equal(302);
@@ -60,7 +60,7 @@ describe('GET /document', () => {
 
   it('should create admin document', (done) => {
     request(app)
-      .post('/api/document').send(fakeAdminDocument)
+      .post('/api/v1/document').send(fakeAdminDocument)
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.status).to.equal(201);
@@ -70,7 +70,7 @@ describe('GET /document', () => {
 
   it('should create new document', (done) => {
     request(app)
-      .post('/api/document').send(privateDoc)
+      .post('/api/v1/document').send(privateDoc)
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.status).to.equal(201);
@@ -80,7 +80,7 @@ describe('GET /document', () => {
 
   it('should create new document', (done) => {
     request(app)
-      .post('/api/document').send(roleDoc)
+      .post('/api/v1/document').send(roleDoc)
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.status).to.equal(201);
@@ -90,7 +90,7 @@ describe('GET /document', () => {
 
   it('should return document created on specified date', (done) => {
     request(app)
-      .get(`/api/document?date=${testDate}`)
+      .get(`/api/v1/document?date=${testDate}`)
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.status).to.equal(200);
@@ -100,7 +100,7 @@ describe('GET /document', () => {
 
   it('should return document of specified user', (done) => {
     request(app)
-      .get('/api/document')
+      .get('/api/v1/document')
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.body.length).to.equal(4);
@@ -110,7 +110,7 @@ describe('GET /document', () => {
 
   it('should not return all documents to non admin user and not user\'s role', (done) => {
     request(app)
-      .get('/api/document')
+      .get('/api/v1/document')
       .set('Authorization', userToken)
       .end((err, res) => {
         expect(res.body.length).to.equal(2);
@@ -120,7 +120,7 @@ describe('GET /document', () => {
 
   it('should return document of specified user', (done) => {
     request(app)
-      .get('/api/user/1/document')
+      .get('/api/v1/user/1/document')
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.body[0].title).to.equal(fakeAdminDocument.title);
@@ -130,7 +130,7 @@ describe('GET /document', () => {
 
   it('should return bad request for non positive integer id', (done) => {
     request(app)
-      .get('/api/user/-1/document')
+      .get('/api/v1/user/-1/document')
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.status).to.equal(400);
@@ -140,7 +140,7 @@ describe('GET /document', () => {
 
     it('should return not found for non existing user document', (done) => {
     request(app)
-      .get('/api/user/7/document')
+      .get('/api/v1/user/7/document')
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.status).to.equal(404);
@@ -150,7 +150,7 @@ describe('GET /document', () => {
 
   it('should return correct status code for unauthorized requests', (done) => {
     request(app)
-      .get('/api/user/1/document')
+      .get('/api/v1/user/1/document')
       .end((err, res) => {
         expect(res.status).to.equal(401);
         done();
@@ -159,7 +159,7 @@ describe('GET /document', () => {
 
   it('should return error status code for unauthorized requests', (done) => {
     request(app)
-      .post('/api/document').send(fakeAdminDocument)
+      .post('/api/v1/document').send(fakeAdminDocument)
       .end((err, res) => {
         expect(res.status).to.equal(401);
         done();
@@ -168,7 +168,7 @@ describe('GET /document', () => {
 
   it('should return documents to authorized user', (done) => {
     request(app)
-      .get('/api/document')
+      .get('/api/v1/document')
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.status).to.equal(200);
@@ -178,7 +178,7 @@ describe('GET /document', () => {
 
   it('should return unauthorized for access without credentials', (done) => {
     request(app)
-      .get('/api/document/Admin')
+      .get('/api/v1/document/Admin')
       .end((err, res) => {
         expect(res.status).to.equal(401);
         done();
@@ -187,7 +187,7 @@ describe('GET /document', () => {
 
   it('should return documents that can be accessed by specified role', (done) => {
     request(app)
-      .get('/api/document/Regular')
+      .get('/api/v1/document/Regular')
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.status).to.equal(200);
@@ -197,7 +197,7 @@ describe('GET /document', () => {
 
   it('should return documents that can be accessed by admin role', (done) => {
     request(app)
-      .get('/api/document/Admin')
+      .get('/api/v1/document/Admin')
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.status).to.equal(200);
@@ -207,7 +207,7 @@ describe('GET /document', () => {
 
   it('should order document when specified', (done) => {
     request(app)
-      .get('/api/document?order=order')
+      .get('/api/v1/document?order=order')
       .set('Authorization', userToken)
       .end((err, res) => {
         expect(res.status).to.equal(200);
@@ -217,7 +217,7 @@ describe('GET /document', () => {
 
   it('should limit document when specified', (done) => {
     request(app)
-      .get('/api/document?limit=1')
+      .get('/api/v1/document?limit=1')
       .set('Authorization', userToken)
       .end((err, res) => {
         expect(res.body.length).to.equal(1);
@@ -227,7 +227,7 @@ describe('GET /document', () => {
 
   it('should allow pagination', (done) => {
     request(app)
-      .get('/api/document?page=3')
+      .get('/api/v1/document?page=3')
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.body.length).to.equal(1);
@@ -237,7 +237,7 @@ describe('GET /document', () => {
 
   it('should return bad request for negative limit', (done) => {
     request(app)
-      .get('/api/document?limit=-1')
+      .get('/api/v1/document?limit=-1')
       .set('Authorization', userToken)
       .end((err, res) => {
         expect(res.status).to.equal(400);
@@ -247,7 +247,7 @@ describe('GET /document', () => {
 
   it('should return error status code for unauthorized requests', (done) => {
     request(app)
-      .get('/api/document')
+      .get('/api/v1/document')
       .end((err, res) => {
         expect(res.status).to.equal(401);
         done();
@@ -256,7 +256,7 @@ describe('GET /document', () => {
 
   it('should return correct updated attribute', (done) => {
     request(app)
-      .put('/api/document/1').send(newDocTitle)
+      .put('/api/v1/document/1').send(newDocTitle)
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.body.title).to.equal(newDocTitle.title);
@@ -266,7 +266,7 @@ describe('GET /document', () => {
 
   it('should return correct updated attribute', (done) => {
     request(app)
-      .put('/api/document/-1').send(newDocTitle)
+      .put('/api/v1/document/-1').send(newDocTitle)
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.status).to.equal(400);
@@ -276,7 +276,7 @@ describe('GET /document', () => {
 
   it('should return error status code for unauthorized requests', (done) => {
     request(app)
-      .put('/api/document/1')
+      .put('/api/v1/document/1')
       .end((err, res) => {
         expect(res.status).to.equal(401);
         done();
@@ -285,7 +285,7 @@ describe('GET /document', () => {
 
   it('should be able to delete document', (done) => {
     request(app)
-      .delete(`/api/document?id=${docId}`)
+      .delete(`/api/v1/document?id=${docId}`)
       .set('Authorization', adminToken)
       .end((err, res) => {
         expect(res.body.message).to.equal('Document deleted');
@@ -295,7 +295,7 @@ describe('GET /document', () => {
 
   it('should not allow unauthorized requests to delete document', (done) => {
     request(app)
-      .delete(`/api/document?id=${docId}`)
+      .delete(`/api/v1/document?id=${docId}`)
       .end((err, res) => {
         expect(res.status).to.equal(401);
         done();

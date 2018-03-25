@@ -18,11 +18,11 @@ describe('Roles', () => {
   before((done) => {
     db.User.sync({ force: true }).then(() => {
       request(app)
-        .post('/api/user').send(fakeAdmin)
+        .post('/api/v1/user').send(fakeAdmin)
         .then(res => {
           fakeAdminToken = res.body.token;
           request(app)
-            .post('/api/user').send(fakeUser)
+            .post('/api/v1/user').send(fakeUser)
             .then(response => {
               fakeUserToken = response.body.token;
               done();
@@ -34,7 +34,7 @@ describe('Roles', () => {
   describe('GET /role', () => {
     it('should return message for non admin user', (done) => {
       request(app)
-        .get('/api/role')
+        .get('/api/v1/role')
         .set('Authorization', fakeUserToken)
         .end((err, res) => {
           expect(res.body.message).to.equal('Invalid access level');
@@ -45,7 +45,7 @@ describe('Roles', () => {
 
     it('should return success status code for admin', (done) => {
       request(app)
-        .get('/api/role')
+        .get('/api/v1/role')
         .set('Authorization', fakeAdminToken)
         .end((err, res) => {
           expect(res.status).to.equal(201);
@@ -55,7 +55,7 @@ describe('Roles', () => {
 
     it('should return correct status code for invalid user', (done) => {
       request(app)
-        .post('/api/role').send(newRole)
+        .post('/api/v1/role').send(newRole)
         .end((err, res) => {
           expect(res.status).to.equal(401);
           done();
@@ -65,7 +65,7 @@ describe('Roles', () => {
 
     it('should return success status code for new role', (done) => {
       request(app)
-        .post('/api/role').send(newRole)
+        .post('/api/v1/role').send(newRole)
         .set('Authorization', fakeAdminToken)
         .end((err, res) => {
           expect(res.status).to.equal(201);
@@ -75,7 +75,7 @@ describe('Roles', () => {
 
     it('should return error status for existing role', (done) => {
       request(app)
-        .post('/api/role').send(newRole)
+        .post('/api/v1/role').send(newRole)
         .set('Authorization', fakeAdminToken)
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -85,7 +85,7 @@ describe('Roles', () => {
 
     it('should return success for admin role', (done) => {
       request(app)
-        .get('/api/role?title=Admin')
+        .get('/api/v1/role?title=Admin')
         .set('Authorization', fakeAdminToken)
         .end((err, res) => {
           expect(res.status).to.equal(201);
@@ -95,7 +95,7 @@ describe('Roles', () => {
 
     it('should return success for regular role', (done) => {
       request(app)
-        .get('/api/role?title=Regular')
+        .get('/api/v1/role?title=Regular')
         .set('Authorization', fakeAdminToken)
         .end((err, res) => {
           expect(res.status).to.equal(201);
@@ -106,7 +106,7 @@ describe('Roles', () => {
 
   it('should allow admin delete role', (done) => {
     request(app)
-      .delete('/api/role/2')
+      .delete('/api/v1/role/2')
       .set('Authorization', fakeAdminToken)
       .end((err, res) => {
         expect(res.status).to.equal(200);
@@ -116,7 +116,7 @@ describe('Roles', () => {
 
   it('should not allow unauthorized user delete role', (done) => {
     request(app)
-      .delete('/api/role/3')
+      .delete('/api/v1/role/3')
       .end((err, res) => {
         expect(res.status).to.equal(401);
         done();
@@ -125,7 +125,7 @@ describe('Roles', () => {
 
   it('should return not found for non existing role', (done) => {
     request(app)
-      .delete('/api/role/3')
+      .delete('/api/v1/role/3')
       .set('Authorization', fakeAdminToken)
       .end((err, res) => {
         expect(res.status).to.equal(404);
@@ -135,7 +135,7 @@ describe('Roles', () => {
 
   it('should return bad request for negative id', (done) => {
     request(app)
-      .delete('/api/role/-3')
+      .delete('/api/v1/role/-3')
       .set('Authorization', fakeAdminToken)
       .end((err, res) => {
         expect(res.status).to.equal(400);
