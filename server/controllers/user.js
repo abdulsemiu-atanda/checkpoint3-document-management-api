@@ -1,11 +1,21 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import { Serializer } from 'jsonapi-serializer';
+
 import db from '../models';
 import Auth from './auth';
 
 require('dotenv').config();
 
 const secret = process.env.SECRET;
+
+const UserSerializer = new Serializer('user', {
+  attributes: ['firstName', 'lastName', 'username', 'RoleId', 'createdAt', 'updatedAt'],
+  keyForAttribute: 'camelCase',
+  meta: {
+    count: record => record.length || 1
+  }
+});
 /**
  * User class that handles all user related actions
  */
@@ -69,10 +79,10 @@ class User {
       .then(user => {
         user.update(req.body).then((response) => {
           return res.status(200)
-            .send({
+            .send(/v1/.test(req.baseUrl) ? {
               message: 'user attribute has been updated',
               newDetails: response
-            });
+            } : UserSerializer.serialize(response));
         });
       });
   }
@@ -129,21 +139,21 @@ class User {
   static fetchDetails(req, res) {
     const detail = Auth.verify(req.headers.authorization);
     if (req.query.id === undefined) {
-      if (detail.roleId !== 1) {
+      if (detail && detail.roleId !== 1) {
         db.User.findOne({
           where: {
             id: detail.id
           },
           attributes: ['id', 'firstName', 'lastName', 'email', 'RoleId']
         }).then(user => {
-          res.status(200).send(user);
+          res.status(200).send(/v1/.test(req.baseUrl) ? user : UserSerializer.serialize(user));
         });
       } else {
         db.User.findAll({
-          attributes: ['id', 'firstName', 'lastName', 'email', 'RoleId']
+          attributes: ['id', 'firstName', 'lastName', 'email', 'RoleId', 'createdAt', 'updatedAt']
         })
           .then(result => {
-            res.status(200).send(result);
+            res.status(200).send(/v1/.test(req.baseUrl) ? result : UserSerializer.serialize(result));
           });
       }
     } else {
@@ -151,7 +161,7 @@ class User {
         where: {
           id: req.query.id
         }
-      }).then(result => res.status(302).send({
+      }).then(result => res.status(302).send(/v1/.test(req.baseUrl) ? {
         id: result.id,
         name: {
           firstName: result.firstName,
@@ -160,7 +170,7 @@ class User {
         email: result.email,
         password: result.password,
         roleId: result.RoleId
-      }));
+      } : UserSerializer.serialize(result)));
     }
   }
   /**

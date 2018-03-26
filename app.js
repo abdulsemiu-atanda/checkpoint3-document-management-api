@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import docRoutes from './server/routes/docRoutes';
 import roleRoutes from './server/routes/roleRoutes';
 import userRoutes from './server/routes/userRoutes';
+import userV2Routes from './server/routes/v2/userRoutes';
 
 // Set up the express app
 const app = express();
@@ -21,6 +22,8 @@ app.get('/api', (req, res) => res.status(200).send({
 app.use('/api/v1/role', roleRoutes);
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/document', docRoutes);
+
+app.use('/api/v2/user', userV2Routes);
 
 // Setup a default catch-all route that sends back a welcome message in JSON format.
 app.get('*', (req, res) => res.status(200).send({

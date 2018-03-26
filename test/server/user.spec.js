@@ -171,7 +171,68 @@ describe('Document Management System', () => {
           done();
         });
     });
+
   });
+
+  describe('V2 GET /user', () => {
+    it('should return all users to admin', (done) => {
+      request(app)
+        .get('/api/v2/user')
+        .set('Authorization', fakeAdminToken)
+        .expect(200)
+        .end((err, res) => {
+          expect(res.body.meta.count).to.equal(2);
+          done();
+        });
+    });
+
+    it('should return created user valid firstName and lastName', (done) => {
+      request(app)
+        .get('/api/v2/user')
+        .set('Authorization', fakeAdminToken)
+        .expect(200)
+        .end((err, res) => {
+          expect(res.body.data[0].attributes.firstName).to.equal(fakeAdmin.firstName)
+          expect(res.body.data[0].attributes.lastName).to.equal(fakeAdmin.lastName)
+          done();
+        });
+    });
+
+    it('should not return all users to non admin user', (done) => {
+      request(app)
+        .get('/api/v2/user')
+        .set('Authorization', fakeUserToken)
+        .expect(200)
+        .end((err, res) => {
+          expect(res.body.meta.count).to.equal(1)
+          expect(res.body.data.attributes.firstName).to.equal(newAttribute.firstName);
+          done();
+        });
+    });
+
+    it('should return correct status code for attribute update', (done) => {
+      request(app)
+        .put('/api/v2/user').send({ firstName: 'Jim' })
+        .set('Authorization', fakeUserToken)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body.data.attributes.firstName).to.equal('Jim')
+          done();
+        });
+    });
+
+    it('should return success for fetching single user', (done) => {
+      request(app)
+        .get(`/api/v2/user?id=${userId}`)
+        .set('Authorization', fakeAdminToken)
+        .end((err, res) => {
+          expect(res.status).to.equal(302);
+          expect(res.body.data.attributes.firstName).to.equal('Jim')
+          done();
+        });
+    });
+  });
+
   describe('POST /user', () => {
     it('should return message when existing user create account', (done) => {
       request(app)

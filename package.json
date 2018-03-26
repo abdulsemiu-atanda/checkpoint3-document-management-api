@@ -9,6 +9,7 @@
   "scripts": {
     "start": "nodemon app.js --exec babel-node",
     "test": "node ./node_modules/babel-cli/bin/babel-node server/seeders/seeders.js && babel-node ./node_modules/.bin/babel-istanbul cover ./node_modules/.bin/_mocha test/server",
+    "seed": "node ./node_modules/babel-cli/bin/babel-node server/seeders/seeders.js",
     "model": "babel-node ./node_modules/.bin/_mocha test/models",
     "migrations": "node_modules/.bin/sequelize db:migrate"
   },
@@ -30,16 +31,17 @@
   },
   "homepage": "https://github.com/andela-aatanda/checkpoint3-document-management-api#readme",
   "dependencies": {
-    "bcrypt": "^0.8.7",
-    "body-parser": "^1.15.2",
-    "dotenv": "^2.0.0",
     "babel-cli": "^6.18.0",
     "babel-core": "^6.21.0",
     "babel-istanbul": "^0.12.1",
     "babel-preset-es2015": "^6.18.0",
     "babel-register": "^6.18.0",
+    "bcrypt": "^0.8.7",
+    "body-parser": "^1.15.2",
+    "dotenv": "^2.0.0",
     "express": "^4.14.0",
     "fs": "0.0.1-security",
+    "jsonapi-serializer": "^3.5.6",
     "jsonwebtoken": "^7.2.1",
     "nodemon": "^1.11.0",
     "pg": "^6.1.0",
