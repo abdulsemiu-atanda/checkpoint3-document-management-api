@@ -190,6 +190,38 @@ class User {
         res.status(200).send({ message: 'User successfuly deleted' });
       });
   }
+  /**
+   * Method that handles deleting user details
+   * @param {Object} req
+   * @param {Object} res
+   * @return {Object} response with status and new token or error
+   */
+  static refreshToken(req, res) {
+    const decoded = Auth.verify(req.headers.authorization);
+    if (req.params.refreshToken) {
+      bcrypt.compare(`${decoded.username}${decoded.id}${decoded.email}`, req.params.refreshToken, (err, result) => {
+        if (result) {
+          const { id, firstName, lastName, email, username, roleId } = decoded;
+          const newToken = jwt.sign({
+            id,
+            firstName,
+            lastName,
+            email,
+            roleId,
+            username
+          }, secret, { expiresIn: '48h' });
+
+          res.status(200).send({
+            message: 'Token expires in two days',
+            token: newToken,
+            refreshToken: req.params.refreshToken
+          });
+        } else {
+          res.status(400).send({ message: 'Invalid refresh token' });
+        }
+      });
+    }
+  }
 }
 
 export default User;
