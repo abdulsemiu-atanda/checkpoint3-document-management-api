@@ -138,7 +138,29 @@ class User {
    */
   static fetchDetails(req, res) {
     const detail = Auth.verify(req.headers.authorization);
-    if (req.query.id === undefined) {
+    if (req.query.refreshToken) {
+      bcrypt.compare(`${detail.username}${detail.id}${detail.email}`, req.query.refreshToken, (err, result) => {
+        if (result) {
+          const { id, firstName, lastName, email, username, roleId } = detail;
+          const newToken = jwt.sign({
+            id,
+            firstName,
+            lastName,
+            email,
+            roleId,
+            username
+          }, secret, { expiresIn: '48h' });
+
+          res.status(200).send({
+            message: 'Token expires in two days',
+            token: newToken,
+            refreshToken: req.query.refreshToken
+          });
+        } else {
+          res.status(400).send({ message: 'Invalid refresh token' });
+        }
+      });
+    } else if (req.query.id === undefined) {
       if (detail.roleId !== 1) {
         db.User.findOne({
           where: {

@@ -12,7 +12,6 @@ module.exports = (app) => {
   app.get('/api/document/:role', Auth.adminUser, Document.access);
   app.get('/api/user/:id/document', Auth.validUser, Document.fetchUserDoc);
   app.get('/api/user', Auth.validUser, User.fetchDetails);
-  app.get('/api/user/:refreshToken', Auth.validUser, User.refreshToken);
   app.post('/api/user/login', User.login);
   app.get('/api/user/logout', User.logout);
 
