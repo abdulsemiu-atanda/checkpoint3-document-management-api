@@ -49,11 +49,11 @@ module.exports = (sequelize, DataTypes) => {
     hooks: {
       beforeCreate: (theUser) => {
         theUser.password = bCrypt.hashSync(theUser.password,
-            bCrypt.genSaltSync(8));
+          bCrypt.genSaltSync(8));
       },
       beforeUpdate: (theUser) => {
         theUser.password = bCrypt.hashSync(theUser.password,
-            bCrypt.genSaltSync(8));
+          bCrypt.genSaltSync(8));
       }
     }
   });

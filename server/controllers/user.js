@@ -41,10 +41,13 @@ class User {
               password: user.password,
               roleId: user.RoleId
             }, secret, { expiresIn: '24h' });
+            const refreshToken = bcrypt.hashSync(`${user.username}${user.id}${user.email}`, bcrypt.genSaltSync(8));
+
             return res.status(201)
               .send({
                 message: 'User created and token expires in a day',
-                token: newToken
+                token: newToken,
+                refreshToken
               });
           }
           return res.status(409).send({ message: 'User already exists' });
@@ -89,25 +92,32 @@ class User {
       }
     })
       .then(result => {
-        bcrypt.compare(req.body.password, result.password, (err, response) => {
-          if (response) {
-            const newToken = jwt.sign({
-              id: result.id,
-              firstName: result.firstName,
-              lastName: result.lastName,
-              email: result.email,
-              username: result.username,
-              password: result.password,
-              roleId: result.RoleId
-            }, secret, { expiresIn: '24h' });
-            res.status(200).send({
-              message: 'Login was successful',
-              token: newToken
-            });
-          } else {
-            res.status(400).send({ message: 'Username or password incorrect' });
-          }
-        });
+        if (result) {
+          bcrypt.compare(req.body.password, result.password, (err, response) => {
+            if (response) {
+              const newToken = jwt.sign({
+                id: result.id,
+                firstName: result.firstName,
+                lastName: result.lastName,
+                email: result.email,
+                username: result.username,
+                password: result.password,
+                roleId: result.RoleId
+              }, secret, { expiresIn: '24h' });
+              const refreshToken = bcrypt.hashSync(`${result.username}${result.id}${result.email}`, bcrypt.genSaltSync(8));
+
+              res.status(200).send({
+                message: 'Login was successful',
+                token: newToken,
+                refreshToken
+              });
+            } else {
+              res.status(400).send({ message: 'Username or password incorrect' });
+            }
+          });
+        } else {
+          res.status(404).send({ message: 'Username or password incorrect' });
+        }
       });
   }
 
